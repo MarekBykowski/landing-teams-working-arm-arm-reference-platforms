@@ -385,7 +385,7 @@ ARMPLATDB = {
         "pbrel": "19.04",
         "docs": "docs/{pdir}",
         "pihooks": [
-          "pcie_fix",
+          "pcie_fix", "mv_grub",
         ],
         "deps": [
           "dl.tool.gcc.scp.7", "dl.tool.gcc.a64",
@@ -1426,6 +1426,12 @@ class sh:
         return "{}/{}".format(dstdir, src.split('/')[-1])
 
 
+    def mv( src, dstdir, rename=None ):
+        dstfile = rename if rename else src.split('/')[-1]
+        dst = "{}/{}".format(dstdir, dstfile)
+        sh._op(shutil.move, src, dst)
+
+
     def rm( p ):
         if sh._op(os.path.isfile, p):
             sh._op(os.remove, p)
@@ -1670,16 +1676,13 @@ class sh:
                               dblu('@.murl', p), dblu('@.mrel', p), manifest)):
                 script.abort("failed to initialise repo")
         def sync():
-            print("Syncing repo")
+            print("Syncing {}...".format(manifest))
             print("NOTE: this can take a very long time, please be patient")
             print("NOTE: you can run script with -v for detailed repo progress")
             if not 0==call_repo("sync -j8 --force-sync"):
                 script.abort("failed to sync repo", hard=False)
         init()
         sync()
-        hooks = dblu("@.pihooks", p, noneAllowed=True)
-        if hooks:
-            [pihooks.__dict__[h]() for h in hooks]
 
 
     """
@@ -1705,10 +1708,19 @@ class pihooks():
      " Fix PCIe quirk on N1SDP (see docs/n1sdp/pcie-quirk.rst)
     """
     def pcie_fix():
-        os.chdir("n1sdp-pcie-quirk")
-        sh.call(["chmod", "a+x", "patch_apply.sh"])
-        sh.call(["bash", "patch_apply.sh"])
-        os.chdir(sh.cwd)
+        if config.ws.meta=="bfs":
+            os.chdir("n1sdp-pcie-quirk")
+            sh.call(["chmod", "a+x", "patch_apply.sh"])
+            sh.call(["bash", "patch_apply.sh"])
+            os.chdir(sh.cwd)
+
+    """
+     " Pull N1SDP grub.img out of board_firmware / prebuilt directory
+    """
+    def mv_grub():
+        src = "board_firmware/SOFTWARE/grub.img" if config.ws.meta=="bfs" else \
+              "n1sdp-latest-oe-uefi/SOFTWARE/grub.img"
+        sh.mv(src, ".", "grub-oe-lamp.img")
 
 
 """
@@ -2019,6 +2031,9 @@ class config:
             for f in files:
                 if not f==preserve:
                     sh.rm("build-scripts/filesystems/"+f)
+        hooks = dblu("@.pihooks", config.p.meta, noneAllowed=True)
+        if hooks:
+            [pihooks.__dict__[h]() for h in hooks]
         print("\nWorkspace initialised.")
         if config.ws.meta=="bfs":
             print("\nTo build:\n")
