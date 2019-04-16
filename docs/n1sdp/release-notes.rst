@@ -42,7 +42,7 @@ Precautions
 Known Issues or limitations
 ---------------------------
 - To boot a standard distribution on N1SDP platform the kernel must be patched
-with the PCIe quirks. See the article `PCIE`_
+  with the PCIe quirks. See the article `PCIE`_
 - PCIe slots limited testing done with few cards like SATA card and GbE card.
 - PCIe tested with GEN1 speed only.
 - No support for PCIe SRIOV.
