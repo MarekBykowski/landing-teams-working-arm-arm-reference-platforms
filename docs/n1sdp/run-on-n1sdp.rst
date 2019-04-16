@@ -14,10 +14,10 @@ Introduction
 The Neoverse N1 System Development Platform (N1SDP) is an enterprise class reference board based on the Neoverse N1 core.
 This document is a guide on how to run an Arm Reference Platforms software stack on N1SDP .
 
-These instructions assumes you have already followed the `user-guide`_ to sync and build an Arm Platforms
+These instructions assumes you have already followed the `user-guide`_ to sync and build an Arm Reference Platforms
 software stack for N1SDP.
 
-The synced workspace includes several board files and prebuilt binaries under *<workspace/board_firmware/>* directory.
+The synced workspace includes several board files and prebuilt binaries under the *<workspace/board_firmware/>* directory.
 
 Setup Preparation
 -----------------
@@ -39,12 +39,10 @@ Use the following commands to burn the GRUB image to a USB stick or SATA drive:
              $ sudo dd if=grub-oe-lamp.img of=/dev/sdX
              $ sync
 
-        Note:
+Note: Replace ``/dev/sdX`` with the handle corresponding to your USB stick or SATA drive, as identified by the ``lsblk`` command.
 
-        Replace ``/dev/sdX`` with the handle corresponding to your USB stick or SATA drive, as identified by the ``lsblk`` command.
-
-        Connect the bootable media to the N1SDP platform; USB sticks should be inserted into to one of the four USB3.0 ports, while
-        SATA drives should be connected to one of the two SATA ports.
+Connect the bootable media to the N1SDP platform; USB sticks should be inserted into to one of the four USB3.0 ports, while
+SATA drives should be connected to one of the two SATA ports.
 
 
 **Configure COM Ports**
@@ -59,7 +57,7 @@ as four virtual COM ports assigned to the following processing entities, in orde
                COM<n+2> - System Control Processor (SCP)
                COM<n+3> - Manageability Control Processor (MCP)
 
-Please check Device Manager in Windows or ls /dev/ttyUSB* in Linux to identify <n..>
+Please check Device Manager in Windows or ls /dev/ttyUSB* in Linux to identify <n>.
 
 Use a serial port application such as *PuTTy* or *minicom* to connect to all virtual COM ports with the following settings:
 
@@ -71,62 +69,53 @@ Use a serial port application such as *PuTTy* or *minicom* to connect to all vir
                1 stop bit
                No flow control
 
-*Note: Some serial port applications refer to this as "115200 8N1" or similar.*
-
-**Preparing a microSD card**
-
-Ensure both BOOT CONF switches are in the OFF position, then issue the following commands in the MCC console:
-
-      ::
-
-              Cmd> USB_ON
-
-This will mount the on-board microSD card as a USB Mass Storage Device on the host PC with name N1SDP.  The new contents to re-flash in
-the SD card is taken from prebuilt image at *<workspace/board_firmware/*>.
-
-SOC Firmware could be overriden after source build from the *<workspace/output/n1sdp/build_artifact/*> to *<sd card mount point/SOFTWARE/>* except the grub-oe-lamp.img
-Issue a sync command on your host PC to ensure copy has completed.
+Note: Some serial port applications refer to this as "115200 8N1" or similar.
 
 Running the deliverables on N1SDP
 ---------------------------------
-For Running the software stack on N1SDP, binaries to prepare bootable disk and micro sd card could be
-fetched in the following two ways as mentioned in `user-guide`_
+
+Ensure both BOOT CONF switches are in the OFF position, then issue the following
+command in the MCC console:
+
+    Cmd> USB_ON
+
+This will mount the on-board microSD card as a USB Mass Storage Device on the
+host PC with the name N1SDP; how you then proceed will depend on whether you
+built from source or chose a prebuilt configuration.
 
 **Prebuilt configuration**
 
-The precompiled SOC firmware as well as the board firmware are synced in *<workspace/n1sdp-latest-oe-uefi/>* and a
-grub-oe-lamp.img in *<workspace/>* Prepare bootable disk and micro sd card as mentioned in section above :
-
+Copy the contents of <workspace/n1sdp-latest-oe-uefi/> onto the mounted microSD
+card, then skip to the ** Booting the board ** section.
 
 **Built from source**
 
-After fetching and building the source, new updated SOC software binaries are copied at *<workspace/output/n1sdp/build_artifact/>*.
-Prepare a bootable disk and micro sd card as mentioned in section above :
-
+Copy the contents of <workspace/board_firmware/> onto the mounted microSD card,
+then copy the .bin files mcp_fw.bin, mcp_rom.bin, scp_fw.bin, and scp_rom.bin from <workspace/output/n1sdp/build_artifact/> to the
+<SOFTWARE/> directory on the mounted microSD card, overwriting the existing files.
 
 **Booting the board**
 
-Ensure all COM ports configuration done . Bootable media prepared and connected and micro sd card formatted with the
-board and SOC firmware. Ensure to connect the ethernet cable to the *onchip PCIe GbE port* to avoid dhcp time out during booting.
-Shutdown and reboot the N1SDP platform from MCC command prompt .
+Insert the bootable disk created earlier, and connect an ethernet cable to the
+Gigabit Ethernet port to avoid DHCP timeouts during boot.
 
-     ::
+Shutdown and reboot the board by issuing the following commands to the MCC
+console:
 
-       Cmd> SHUTDOWN
-       Cmd> REBOOT
+    Cmd> SHUTDOWN
+    Cmd> REBOOT
 
+On rebooting, the board will copy the new binaries and firmware images from
+the microSD card into either on-board QSPI flash or DDR3 memory via the IOFPGA;
+see <MB/images.txt> on the microSD card.
 
-Once the programming is done, the board will boot up and run the new software images.
-The REBOOT command initializes all the board components and flashes the binaries from the micro SD card into on-board QSPI flash
-memory or DDR3 memory connected to the IOFPGA. Destination for programming the binaries and programming settings can be checked
-in *<MB/images.txt>* on the micro SD card.
-
-Enter to the UEFI menu by pressing *Esc* on the AP Console as the *edk2* logs start appearing. User can select from the UEFI
-boot manager, which media to boot from.
-
+Enter the UEFI menu by pressing Esc on the AP console as the edk2 logs start
+appearing; from here, enter the UEFI Boot Manager menu and select which media
+to boot from.
 
 --------------
 
 *Copyright (c) 2019, Arm Limited. All rights reserved.*
 
 .. _user-guide: ../user-guide.rst
+
