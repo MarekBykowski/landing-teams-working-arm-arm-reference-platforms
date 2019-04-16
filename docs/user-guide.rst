@@ -16,7 +16,7 @@ instead of using ``sync_workspace.py``:
 
 - System Guidance for Infrastructure (SGI): `SGI-575 <sgi575/user-guide.rst>`__
 
-- Neoverse Reference Design (RD): `RD-N1-Edge <rdn1edge/user-guide.rst>`__,
+- Neoverse(TM) Reference Design (RD): `RD-N1-Edge <rdn1edge/user-guide.rst>`__,
   `RD-E1-Edge <rde1edge/user-guide.rst>`__
 
 Please use the links above to sync a software stack for one of these platforms.
@@ -49,6 +49,8 @@ Initialising your workspace
 Simply run the ``sync_workspace.py`` script using Python 3, then follow the
 on-screen menus to select your platform and software stack configuration::
 
+  $ git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
+  $ cd arm-reference-platforms/
   $ python3 sync_workspace.py
 
 Building from source
@@ -75,7 +77,7 @@ How you proceed will depend on your platform and chosen software stack.
 
 The following platform user guides are maintained in this git repository:
 
-- `Neoverse N1 SDP <n1sdp/user-guide.rst>`__
+- `Neoverse(TM) N1 SDP <n1sdp/run-on-n1sdp.rst>`__
 
 The following platform user guides are currently still maintained on our
 `Arm Community wiki <https://community.arm.com/developer/tools-software/oss-platforms/w/docs>`__:
