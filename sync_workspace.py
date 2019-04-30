@@ -190,7 +190,7 @@ if HOST=="Windows":
 ARMPLATDB = {
   "arm": {
     "rel": "19.03", "pbrel": "19.01", "mrel": "19.01",
-    "cms": "cms.developer.arm.com",
+    "cms": "developer.arm.com",
   },
 
   "linaro": {
