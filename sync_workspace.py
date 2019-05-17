@@ -33,14 +33,15 @@
  " POSSIBILITY OF SUCH DAMAGE.
 """
 
+"""
+ " If running on Python < 3.5, we'll hit syntax errors further down the script
+ " before getting a chance to programmatically query version_info from sys.
+ "
+ " By deliberately invoking the syntax error here, we can at least print a
+ " helpful message to the user.
+"""
 x=["foo", "bar"]
 vsn_check = "{}{}".format(*x, "if you can see this, you need Python 3.5+")
-
-# The above check is sufficient for now; if in future we require 3.6+ then we'll
-# need both hecks (having only the below check will give unhelpful syntax errors
-# further down the script without explaining why, as the check never gets to run)
-#from sys import version_info as PYVER
-#assert (PYVER[0], PYVER[1]) >= (3,5), "script requires Python 3.5+"
 
 import argparse
 import bz2
@@ -1260,30 +1261,29 @@ class script:
     def init():
         # Parse arguments
         p = argparse.ArgumentParser()
-        p.add_argument("-v", help="verbose info", action="count", default=0)
+        p.add_argument("-v", help="[DEPRECATED] verbosity", action="count",
+                       default=0)
         p.add_argument("--qa_mode", help="for Arm internal QA purposes",
                        action="store_true")
         p.add_argument("--no_check_apt_deps", action="store_true",
                        help="do not check for APT package dependencies")
         args = p.parse_args()
-        (script.v, script.qa_mode, script.no_check_apt_deps) = \
-            (args.v, args.qa_mode, args.no_check_apt_deps)
+        (script.qa_mode, script.no_check_apt_deps) = \
+            (args.qa_mode, args.no_check_apt_deps)
+        if args.v > 0:
+            print("[WARN] the -v flag is deprecated")
         # Configure logging
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
+        fmt = logging.Formatter("%(levelname)s: %(message)s")
         console = logging.StreamHandler()
-        # Logging level increases with number of -v on command line
-        script.loglvl = {0:logging.WARNING, 1:logging.INFO, 2:logging.DEBUG} \
-            [max(0, min(script.v, 2))]
-        console.setLevel(script.loglvl)
-        console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+        console.setLevel(logging.INFO)
+        console.setFormatter(fmt)
+        logfile = logging.FileHandler("log.txt", "w")
+        logfile.setLevel(logging.DEBUG)
+        logfile.setFormatter(fmt)
         logger.addHandler(console)
-        # 2+ -v enables logging to file
-        if script.v > 2:
-            fh = logging.FileHandler("log.txt", "w")
-            fh.setLevel(logging.DEBUG)
-            fh.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-            logger.addHandler(fh)
+        logger.addHandler(logfile)
         log.info("Arm Reference Platforms Software {}".format(dblu("arm.rel")))
         log.info("date is {}".format(time.strftime('%Y-%m-%d %H:%M:%S')))
         log.info("running on {} host".format(HOST))
@@ -1659,7 +1659,7 @@ class sh:
         def call_repo(argstr):
             sp = subprocess
             cmdline = ['unbuffer', 'python2', repo] + argstr.split(' ')
-            log.debug("calling {}".format(cmdline))
+            log.info("calling {}".format(" ".join(cmdline)))
             proc = sp.Popen(cmdline, stdout=sp.PIPE, stderr=sp.STDOUT,
                             bufsize=0, universal_newlines=True)
             ln = ""
@@ -1671,14 +1671,13 @@ class sh:
                 proc.poll()
             return proc.returncode
         def init():
-            print("\nInitialising repo")
-            if not 0==call_repo("init -u {} -b {} -m {}".format(
-                              dblu('@.murl', p), dblu('@.mrel', p), manifest)):
+            log.info("initialising repo")
+            cmd = "init -u {} -b {} -m {}".format(
+                      dblu('@.murl', p), dblu('@.mrel', p), manifest)
+            if not 0==call_repo(cmd):
                 script.abort("failed to initialise repo")
         def sync():
-            print("Syncing {}...".format(manifest))
-            print("NOTE: this can take a very long time, please be patient")
-            print("NOTE: you can run script with -v for detailed repo progress")
+            log.info("syncing repo")
             if not 0==call_repo("sync -j8 --force-sync"):
                 script.abort("failed to sync repo", hard=False)
         init()
@@ -1919,7 +1918,7 @@ def check_pip_deps( lst ):
  " Building some host tools breaks with a host gcc that is too old or too new.
 """
 def check_sys_gcc():
-    log.debug("checking system gcc")
+    log.info("checking system gcc")
     (_, out, _) = sh.call(["gcc", "-dumpversion"])
     ver = tuple([int(i) for i in out.split(".")])
     if ver < (5,4,0) or ver >= (8,0,0):
@@ -1932,7 +1931,7 @@ def check_sys_gcc():
  " Git must be sufficiently configured for repo to work.
 """
 def check_git_config():
-    log.debug("checking git config")
+    log.info("checking git config")
     (_, cfg, _)  = sh.call(["git", "config", "-l"])
     for setting in ["user.name", "user.email", "color.diff"]:
         if not setting in cfg:
