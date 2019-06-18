@@ -56,6 +56,14 @@ on-screen menus to select your platform and software stack configuration::
 Building from source
 --------------------
 
+How you proceed will depend on your platform and chosen software stack.
+
+The following platforms support different build systems
+
+* Corstone-700 : `Corstone-700 User guide <corstone-700/user-guide.rst>`__
+
+For Other platforms:
+
 To clean, build, and package the software in a build from source workspace::
 
   $ ./build-scripts/build-all.sh all
@@ -78,6 +86,7 @@ How you proceed will depend on your platform and chosen software stack.
 The following platform user guides are maintained in this git repository:
 
 - `Neoverse(TM) N1 SDP <n1sdp/run-on-n1sdp.rst>`__
+- `Corstone-700 <corstone-700/user-guide.rst>`__
 
 The following platform user guides are currently still maintained on our
 `Arm Community wiki <https://community.arm.com/developer/tools-software/oss-platforms/w/docs>`__:

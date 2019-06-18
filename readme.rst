@@ -46,6 +46,13 @@ Infrastructure segment platforms include:
 - Booting multiple instances of a guest OS using Linux KVM & kvmtool is also
   supported
 
+Rich IoT segment platforms include:
+
+- Boot-firmware
+- Trusted Firmware-A
+- Mainline Linux kernel
+- Yocto build and packaging using poky tiny filesystem
+
 All platforms also support a basic Linux boot to a BusyBox ramdisk filesystem.
 
 These software stacks are updated and tested as part of a quarterly release and
@@ -64,6 +71,7 @@ The following platforms are supported:
 - `Armv8-A Foundation Model FVP <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/228/fvps>`__
 - System Guidance for Mobile (SGM): `SGM-775 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/388/system-guidance-for-mobile-sgm>`__
 - `TC2 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/227/tc2>`__
+- `Corstone-700 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/444/corstone-700>`__
 
 The following platforms are also supported, but currently require users to
 manually sync the software stack sources:
