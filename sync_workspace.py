@@ -285,6 +285,7 @@ ARMPLATDB = {
     "pbrel": "{arm.pbrel}",
     "pburl": "{linaro.url}/members/arm/platforms/{pbrel}",
     "docs": "https://community.arm.com/oss-platforms/w/docs/",
+    "build": "arm",
     "pihooks": "null",
     "type": "null",
     "ack": {
@@ -482,11 +483,11 @@ ARMPLATDB = {
               "fw.edkii",
             ],
             "pb": [
-              #"pb.ack.android.debug",      # Temporarily unavailable
+              "pb.ack.android",
+              "pb.latest.oe.mini",
+              "pb.latest.oe.lamp",
               "pb.ack.busybox",
               "pb.latest.busybox",
-              #"pb.latest.oe.mini.debug",   # Temporarily unavailable
-              #"pb.latest.oe.lamp.debug",   # Temporarily unavailable
               "pb.edkii",
             ],
           },
@@ -567,12 +568,42 @@ ARMPLATDB = {
       },
     },
 
+    ### Corstone
+    "corstone": {
+      "name": "Corstone Foundation IP",
+
+      ### Corstone-700
+      "700": {
+        "name": "Corstone-700",
+        "pdir": "corstone700",
+        "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
+        "mrel": "master",
+        "build": "yocto",
+        "docs": "docs/{pdir}",
+        "platsw": {
+          "manifest": "{pdir}.xml",
+        },
+        "k": "null",
+        "fs": "null",
+        "fw": [
+          "fw.platsw",
+        ],
+        "pb": "null",
+        "includes": [
+          "oc.tfa", "oc.tiny", "oc.cmsis",
+        ],
+        "excludes": [
+          "fw.platsw", # Hide it from final configuration summary
+        ],
+      },
+    },
+
     ### All supported platforms
     ### Platforms need to be in this list to appear in the menus
     "all": [
       "p.board.juno.64b", "p.board.juno.legacy", "p.board.tc2",
       "p.fvp.v8a.base.64b", "p.fvp.v8a.base.legacy", "p.fvp.v8a.fndn.64b",
-      "p.fvp.sg.m.775", "p.board.n1sdp",
+      "p.fvp.sg.m.775", "p.board.n1sdp", "p.corstone.700",
     ],
   },
 
@@ -735,20 +766,24 @@ ARMPLATDB = {
 
 
   ###
-   # Firmware and test suites that can be chosen by the user.
+   # Other software stacks that can be chosen by the user, including firmware and
+   # test suites.
    #
-   # Each firmware must define:
+   # Each fw must define:
    #
    #    name: display name printed in menus
-   #    stubfs: build script file name
    #    manifest: repo manifest file name
    #
-   # Firmware may optionally define:
+   # If a fw is built using the Arm build scripts, it must define:
+   #
+   #    stubfs: build script file name
+   #
+   # A fw may optionally define:
    #
    #    descr: description printed in menus
   ###
   "fw": {
-    "name": "Firmware & test suites",
+    "name": "Other",
 
     ### EDK II UEFI
     "edkii" : {
@@ -759,6 +794,13 @@ ARMPLATDB = {
       "excludes": [
         "oc.uboot",
       ],
+    },
+
+    ### Platform-specific software stack e.g. for Corstone-700
+    "platsw": {
+      "name": "{@.name} software stack",
+      "priority": 31,
+      "manifest": "{@.platsw.manifest}",
     },
   },
 
@@ -964,6 +1006,18 @@ ARMPLATDB = {
       "excludes": [
         "fw.edkii",
       ],
+    },
+
+    ### Tiny Linux
+    "tiny": {
+      "name": "Tiny Linux distribution (based on Poky-Tiny)",
+      "priority": 41,
+    },
+
+    ### CMSIS
+    "cmsis": {
+      "name": "Arm CMSIS",
+      "priority": 51,
     },
   },
 
@@ -1833,7 +1887,7 @@ def tree_prompt( title, root ):
  " source for the user's chosen platform.
 """
 def check_platform_deps( p ):
-    plat_type = dblu("@.type", p)
+    plat_type = dblu("@.type", p, noneAllowed=True)
     apt_deps = dblu("pkgs.apt.common")
     pip_deps = []
     if plat_type in ["i", "m"]:
@@ -2001,59 +2055,63 @@ class config:
             sh.fetch(d, plat=config.p.meta)
         if config.manifest:
             force_fresh = False
-            while True:
-                sh.reposync( config.manifest, config.p.meta, force_fresh )
-                for (_, dirs, _) in os.walk("build-scripts/platforms"):
-                    break  # don't recursively walk
-                for (_, _, files) in os.walk("build-scripts/filesystems"):
-                    break  # don't recursively walk
-                if dirs and files:
-                    break
-                else:
-                    log.error("detected missing files/folders in build-scripts/")
-                    log.error("repo may be in an invalid/corrupt state")
-                    log.error("did you lose internet connection during sync?")
-                    msg = ("Detected potential invalid/corrupt repo state, try "
-                           "to sync again?")
-                    if not prompt(msg,
-                        [choice("Yes", True), choice("No", False)]
-                    ).meta:
-                        sys.exit(0)
-                    force_fresh = True
-                    filelist = get_ws_files()
-                    [sh.rmdir(f) if f.endswith("/") else sh.rm(f) for f in filelist]
-            for d in dirs:
-                if not (d=="common" or d==dblu(config.p.meta+".pdir")):
-                    sh.rmdir("build-scripts/platforms/"+d)
-            preserve = dblu(config.fs.meta+".script") if config.env.meta=="k" \
-                  else dblu(config.fw.meta+".stubfs")
-            for f in files:
-                if not f==preserve:
-                    sh.rm("build-scripts/filesystems/"+f)
+            arm_build = dblu("@.build", config.p.meta) == "arm"
+            sh.reposync( config.manifest, config.p.meta, force_fresh )
+            if arm_build:
+                while True:
+                    for (_, dirs, _) in os.walk("build-scripts/platforms"):
+                        break  # don't recursively walk
+                    for (_, _, files) in os.walk("build-scripts/filesystems"):
+                        break  # don't recursively walk
+                    if dirs and files:
+                        break
+                    else:
+                        log.error("detected missing files/folders in build-scripts/")
+                        log.error("repo may be in an invalid/corrupt state")
+                        log.error("did you lose internet connection during sync?")
+                        msg = ("Detected potential invalid/corrupt repo state, try "
+                               "to sync again?")
+                        if not prompt(msg,
+                            [choice("Yes", True), choice("No", False)]
+                        ).meta:
+                            sys.exit(0)
+                        force_fresh = True
+                        filelist = get_ws_files()
+                        [sh.rmdir(f) if f.endswith("/") else sh.rm(f) for f in filelist]
+                for d in dirs:
+                    if not (d=="common" or d==dblu(config.p.meta+".pdir")):
+                        sh.rmdir("build-scripts/platforms/"+d)
+                preserve = dblu(config.fs.meta+".script") if config.env.meta=="k" \
+                      else dblu(config.fw.meta+".stubfs")
+                for f in files:
+                    if not f==preserve:
+                        sh.rm("build-scripts/filesystems/"+f)
         hooks = dblu("@.pihooks", config.p.meta, noneAllowed=True)
         if hooks:
             [pihooks.__dict__[h]() for h in hooks]
         print("\nWorkspace initialised.")
         if config.ws.meta=="bfs":
-            print("\nTo build:\n")
-            print("    chmod a+x <workspace>/build-scripts/build-all.sh")
-            print("    <workspace>/build-scripts/build-all.sh all")
-            print("\nResulting binaries will be placed in:")
-            print("\n    <workspace>/output/{}-{}/".format(
-                      dblu("@.pdir", config.p.meta),
-                      dblu(config.fs.meta+".script" if config.env.meta=="k" \
-                          else config.fw.meta+".stubfs", config.p.meta)))
+            if arm_build:
+                print("\nTo build:\n")
+                print("    chmod a+x <workspace>/build-scripts/build-all.sh")
+                print("    <workspace>/build-scripts/build-all.sh all")
+                print("\nResulting binaries will be placed in:")
+                print("\n    <workspace>/output/{}-{}/".format(
+                          dblu("@.pdir", config.p.meta),
+                          dblu(config.fs.meta+".script" if config.env.meta=="k" \
+                              else config.fw.meta+".stubfs", config.p.meta)))
         print("\nFor more information, see the docs here:")
         print("\n    {}".format(dblu('@.docs', config.p.meta)))
         print("\nVisit our forums for platforms & open source discussions:")
         print("\n    https://community.arm.com/oss-platforms/f")
-        print("\nThank you for using Arm Reference Platforms Software.")
+        print("\nThank you for using Arm Reference Platforms.")
 
 
     def _choose():
         config.cfg = []
         config.deps = []
         config.swcs = []
+        config.excludes = []
         config.manifest = None
         config._add_cfg("Workspace", sh.cwd)
         config._choose_p()
@@ -2080,6 +2138,8 @@ class config:
                    .format(row[0], pad[0], row[1], pad[1])
         msg += wall
         if config.swcs:
+            config.excludes = set(config.excludes)
+            config.swcs = [x for x in config.swcs if x not in config.excludes]
             config.swcs = sorted(list(set(config.swcs)),
                         key = lambda swc: dblu(swc+".priority", config.p.meta))
             rows = []
@@ -2120,9 +2180,7 @@ class config:
                 config.swcs.append(i)
                 config._update_includes(i)
         if excls:
-            for e in excls:
-                if e in config.swcs:
-                    config.swcs.remove(e)
+            config.excludes += excls
 
 
     def _choose_p():
