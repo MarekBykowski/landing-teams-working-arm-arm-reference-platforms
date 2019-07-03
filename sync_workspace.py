@@ -383,8 +383,10 @@ ARMPLATDB = {
         ],
         "pdir": "n1sdp",
         "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
-        "mrel": "master",
-        "pbrel": "19.04",
+        "mrel": "???",
+        "mkey": "N1SDP",
+        "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
+        "pbrel": "N1SDP-ALPHA2-19.07",
         "docs": "docs/{pdir}",
         "pihooks": [
           "pcie_fix", "mv_grub",
@@ -395,12 +397,15 @@ ARMPLATDB = {
         "k": [
           "k.mainline"
         ],
+        "linux": {
+          "vsn": "5.1",
+        },
         "fs": [
-          "fs.oe.lamp.n1sdp",
+          "fs.ubuntu",
         ],
         "fw": "null",
         "pb": [
-          "pb.latest.oe.lamp.edkii",
+          "pb.ubuntu",
         ],
       },
 
@@ -577,7 +582,8 @@ ARMPLATDB = {
         "name": "Corstone-700",
         "pdir": "corstone700",
         "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
-        "mrel": "master",
+        "mrel": "???",
+        "mkey": "CORSTONE-700",
         "build": "yocto",
         "docs": "docs/{pdir}",
         "platsw": {
@@ -672,7 +678,7 @@ ARMPLATDB = {
       "name": "Mainline Kernel",
       "manifest": "pinned-{@.pdir}.xml",
       "fs": [
-        "fs.busybox", "fs.fedora", "fs.oe.lamp.n1sdp",
+        "fs.busybox", "fs.fedora", "fs.ubuntu",
       ],
     },
   },
@@ -762,6 +768,20 @@ ARMPLATDB = {
         "dl.img.fedora",
       ],
     },
+
+    ### Ubuntu Server
+    "ubuntu": {
+      "name": "Ubuntu Server",
+      "script": "ubuntu",
+      "deps": [
+        "dl.fs.ubuntu",
+        "dl.fs.ubuntu.patch.0001",
+        "dl.fs.ubuntu.patch.0002",
+        "dl.fs.ubuntu.patch.0003",
+        "dl.fs.ubuntu.patch.0004",
+        "dl.fs.ubuntu.patch.0005",
+      ],
+    },
   },
 
 
@@ -814,6 +834,17 @@ ARMPLATDB = {
    #    deps: list of required downloads
   ###
   "pb": {
+
+    ### Ubuntu
+    "ubuntu": {
+      "name": "{k.mainline.name} + {fs.ubuntu.name}",
+      "deps": [
+        "dl.archive.ubuntu",
+      ],
+      "includes": [
+        "k.mainline", "fs.ubuntu",
+      ],
+    },
 
     ### ACK configs
     "ack": {
@@ -1039,6 +1070,7 @@ ARMPLATDB = {
    # actual URL used to download the md5 checksum file is "{url}/{md5name}".
   ###
   "dl": {
+    "extract": "true", # Default behaviour is to extract recognised archive formats
 
     ### Tools
     "tool": {
@@ -1148,6 +1180,35 @@ ARMPLATDB = {
       },
     },
 
+    ### Filesystem archives
+    "fs": {
+      "ubuntu": {
+        "url": "http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current",
+        "name": "bionic-base-arm64.tar.gz",
+        "dir": "build-scripts/prebuilts/ubuntu",
+        "extract": "false",
+
+        "patch": {
+          "url": "https://kernel.ubuntu.com/~kernel-ppa/mainline/v{@.linux.vsn}",
+          "0001": {
+            "name": "0001-base-packaging.patch",
+          },
+          "0002": {
+            "name": "0002-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch",
+          },
+          "0003": {
+            "name": "0003-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch",
+          },
+          "0004": {
+            "name": "0004-debian-changelog.patch",
+          },
+          "0005": {
+            "name": "0005-configs-based-on-Ubuntu-5.1.0-2.2.patch",
+          },
+        },
+      },
+    },
+
     ### Prebuilt archives
     "archive": {
       "url": "{@.pburl}",
@@ -1215,6 +1276,13 @@ ARMPLATDB = {
       "edkii": {
         "basename": "{name0}-{fw.edkii.stubfs}",
       },
+
+      ### Ubuntu
+      "ubuntu": {
+        "basename": "{@.pdir}-board-firmware-{@.pbrel}",
+        "fmt": "tar.gz",
+        "md5name": "null",
+      },
     },
   },
 }
@@ -1262,6 +1330,8 @@ class Database(dict):
                 item = None
             elif "true" == item:
                 item = True
+            elif "false" == item:
+                item = False
             else:
                 item = subPlat(item)
                 if not item.count("{")==item.count("}"):
@@ -1535,6 +1605,10 @@ class sh:
         return sh._std_extract(tarfile.open, src, dstdir, "r:bz2", errorlevel=1)
 
 
+    def _tarxzf( src, dstdir ):
+        return sh._std_extract(tarfile.open, src, dstdir, "r:gz", errorlevel=1)
+
+
     def _unzip( src, dstdir ):
         return sh._std_extract(zipfile.ZipFile, src, dstdir, "r")
 
@@ -1548,18 +1622,23 @@ class sh:
 
 
     """
-     " Extract (if an archive) or copy (if not an archive) a downloaded file
-     " from the hidden .downloads/ dir to the file's intended destination dir.
+     " Extract an archive to a directory, falling back on regular copy if the
+     " file is not recognised as an archive. Pass extract=False to also force
+     " recognised archives to be copied instead of extracted.
     """
-    def extract_or_copy( src, dstdir ):
+    def extract_or_copy( src, dstdir, extract=True ):
         sh.mkdir(dstdir)
         ends = lambda s: src.endswith(s)
-        handler = sh._tarxf   if ends(".tar.xz") else \
-                  sh._tarxjf  if ends(".tar.bz2") else \
-                  sh._unzip   if ends(".zip") else \
-                  sh._gunzip  if ends(".gz") and not ends(".tar.gz") else \
-                  sh._bunzip2 if ends(".bz2") and not ends(".tar.bz2") else \
-                  sh.cp
+        if not extract:
+            handler = sh.cp
+        else:
+            handler = sh._tarxf   if ends(".tar.xz") else \
+                      sh._tarxjf  if ends(".tar.bz2") else \
+                      sh._tarxzf  if ends(".tar.gz") else \
+                      sh._unzip   if ends(".zip") else \
+                      sh._gunzip  if ends(".gz") and not ends(".tar.gz") else \
+                      sh._bunzip2 if ends(".bz2") and not ends(".tar.bz2") else \
+                      sh.cp
         return handler(src, dstdir)
 
 
@@ -1678,8 +1757,8 @@ class sh:
      "
     """
     def fetch( key, plat=None, force_fresh=False ):
-        (url, name, md5name, dstdir) =  \
-            dblum(key, ["url","name","md5name","dir"], plat, noneAllowed=True)
+        (url, name, md5name, dstdir, extract) =  \
+            dblum(key, ["url","name","md5name","dir","extract"], plat, noneAllowed=True)
         dld = sh.url2dld(url)
         dlfile = "{}/{}".format(dld, name.split('/')[-1])
         if md5name:
@@ -1699,13 +1778,13 @@ class sh:
                     script.abort("MD5 mismatch after fetching {} (md5file={})"
                                  .format(dlfile, md5file), hard=False)
         print("Extracting {}".format(name))
-        return sh.extract_or_copy(dlfile, dstdir)
+        return sh.extract_or_copy(dlfile, dstdir, extract)
 
 
     """
      " Sync a repo manifest.
     """
-    def reposync( manifest, p, force_fresh=False ):
+    def reposync( manifest, p, mrel, force_fresh=False,):
         log.info("Attempting to sync "+manifest)
         if force_fresh:
             sh.rmdir(".repo")
@@ -1726,8 +1805,7 @@ class sh:
             return proc.returncode
         def init():
             log.info("initialising repo")
-            cmd = "init -u {} -b {} -m {}".format(
-                      dblu('@.murl', p), dblu('@.mrel', p), manifest)
+            cmd = "init -u {} -b {} -m {}".format(dblu('@.murl', p), mrel, manifest)
             if not 0==call_repo(cmd):
                 script.abort("failed to initialise repo")
         def sync():
@@ -1771,9 +1849,12 @@ class pihooks():
      " Pull N1SDP grub.img out of board_firmware / prebuilt directory
     """
     def mv_grub():
-        src = "board_firmware/SOFTWARE/grub.img" if config.ws.meta=="bfs" else \
-              "n1sdp-latest-oe-uefi/SOFTWARE/grub.img"
-        sh.mv(src, ".", "grub-oe-lamp.img")
+        if config.ws.meta == "bfs":
+            base = "board_firmware"
+        else:
+            base = dblu("dl.archive.ubuntu.basename", config.p.meta)
+            base = "{}/{}".format(base, base)
+        sh.mv(base+"/SOFTWARE/grub.img", ".", "grub-ubuntu.img")
 
 
 """
@@ -1940,7 +2021,7 @@ def check_apt_deps( lst ):
     sys.stdout.flush()
     cache = apt.Cache()
     try:
-        missing = list(filter(lambda d: not cache[d].is_installed, lst))
+        missing = list(filter(lambda d: not cache[d].is_installed, set(lst)))
     except KeyError as e:
         print()
         e = "{}".format(e).split("'")[1]
@@ -2013,6 +2094,17 @@ def get_ws_files():
 
 
 """
+ " Fetch a list of tags from a remote git repository.
+"""
+def get_mtags( url ):
+    (ret, tags, err) = sh.call(["git", "ls-remote", "--refs", "--tags", url])
+    if not ret == 0:
+        script.abort("failed to query remote tags at {} ({})".format(url, err))
+    tags = tags.splitlines()
+    return [t[t.find("refs/tags/"):] for t in tags]
+
+
+"""
  " Check whether <workspace> is empty and, if not, confirm with user whether
  " it's OK to delete these files/folders and proceed.
 """
@@ -2056,7 +2148,7 @@ class config:
         if config.manifest:
             force_fresh = False
             arm_build = dblu("@.build", config.p.meta) == "arm"
-            sh.reposync( config.manifest, config.p.meta, force_fresh )
+            sh.reposync( config.manifest, config.p.meta, config.mrel, force_fresh )
             if arm_build:
                 while True:
                     for (_, dirs, _) in os.walk("build-scripts/platforms"):
@@ -2246,6 +2338,7 @@ class config:
         config._add_swc(config.fw.meta)
         config._update_includes(config.fw.meta)
         config.manifest = dblu(config.fw.meta+".manifest", config.p.meta)
+        config._choose_mrel()
 
 
     def _choose_k():
@@ -2257,6 +2350,19 @@ class config:
         config._update_includes(config.k.meta)
         if not dblu(config.k.meta+".maps", noneAllowed=True):
             config.manifest = dblu(config.k.meta+".manifest", config.p.meta)
+            config._choose_mrel()
+
+
+    def _choose_mrel():
+        (murl, mrel, mkey) = dblum("@", ["murl", "mrel", "mkey"], config.p.meta, noneAllowed=True)
+        if mrel == "???":
+            choices = [choice("master", descr="(may incl. interim updates)", meta="master")]
+            choices += [choice(t, meta=t) for t in list(filter(lambda t: mkey in t, get_mtags(murl)))]
+            mrel = prompt("Please select a manifest release tag to checkout", choices)
+            config.mrel = mrel.meta
+        else:
+            config.mrel = mrel
+        config._add_cfg("Tag", config.mrel)
 
 
     def _choose_fs():
@@ -2267,8 +2373,7 @@ class config:
         fss = [fs for fs in kernel_fss if fs in plat_fss]
         fstree = choice.tree(fss, "fs", config.p.meta)
         config.fs = tree_prompt("Please select your filesystem", fstree)
-        config._add_cfg("Configuration", "{} + {}"
-                                         .format(config.k.name, config.fs.name))
+        config._add_cfg("Configuration", "{} + {}".format(config.k.name, config.fs.name))
         config._add_deps(config.fs.meta)
         config._add_swc(config.fs.meta)
         config._update_includes(config.fs.meta)
@@ -2324,9 +2429,12 @@ def run_qa():
                 deps = dblu(k+".deps", plat=p, noneAllowed=True)
                 if deps:
                     [sh.fetch(d, plat=p, force_fresh=True) for d in deps]
+    """
+     " TODO: re-add support for QA run manifest reposync incl. tags
     for m in list(set(manifests)):
         log.info(">>> Attempting to sync manifest "+m)
         sh.reposync(m, "p", force_fresh=True)
+    """
     return script.end_qa()
 
 
