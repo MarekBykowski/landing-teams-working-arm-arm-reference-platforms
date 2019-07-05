@@ -25,10 +25,10 @@ Setup Preparation
 **Preparing a bootable disk**
 
 A bootable disk (USB stick or SATA drive) can be prepared by formatting it with the prebuilt image located at
-*<workspace/grub-oe-lamp.img>* or the source build image at the location *<workspace/output/n1sdp/build_artifact/grub-oe-lamp.img>*
+*<workspace/grub-ubuntu.img>* or the source build image at the location *<workspace/output/n1sdp/build_artifact/grub-ubuntu.img>*
 after the source build.
 
-This is a bootable GRUB image comprising LINUX and an OpenEmbedded LAMP file system. The partitioning and packaging is performed
+This is a bootable GRUB image comprising LINUX and an Ubuntu 18.04 file system. The partitioning and packaging is performed
 during the build.
 
 Use the following commands to burn the GRUB image to a USB stick or SATA drive:
@@ -36,7 +36,7 @@ Use the following commands to burn the GRUB image to a USB stick or SATA drive:
         ::
 
              $ lsblk
-             $ sudo dd if=grub-oe-lamp.img of=/dev/sdX
+             $ sudo dd if=grub-ubuntu.img of=/dev/sdX bs=1M
              $ sync
 
 Note: Replace ``/dev/sdX`` with the handle corresponding to your USB stick or SATA drive, as identified by the ``lsblk`` command.
@@ -83,10 +83,23 @@ This will mount the on-board microSD card as a USB Mass Storage Device on the
 host PC with the name N1SDP; how you then proceed will depend on whether you
 built from source or chose a prebuilt configuration.
 
+Ensure that time is correctly set on N1SDP board through following command in
+the MCC console if not set then change it accordingly:
+
+      ::
+
+             Cmd> debug
+             Debug> time
+             Debug> date
+             Debug> exit
+
+
+
+
 **Prebuilt configuration**
 
-Copy the contents of <workspace/n1sdp-latest-oe-uefi/> onto the mounted microSD
-card, then skip to the ** Booting the board ** section.
+Copy the contents of <workspace/n1sdp-board-firmware-N1SDP-ALPHA2-19.07/n1sdp-board-firmware-N1SDP-ALPHA2-19.07/>
+onto the mounted microSD card, then skip to the ** Booting the board ** section.
 
 **Built from source**
 
@@ -102,16 +115,28 @@ Gigabit Ethernet port to avoid DHCP timeouts during boot.
 Shutdown and reboot the board by issuing the following commands to the MCC
 console:
 
-    Cmd> SHUTDOWN
-    Cmd> REBOOT
+    ::
+
+             Cmd> SHUTDOWN
+             Cmd> REBOOT
 
 On rebooting, the board will copy the new binaries and firmware images from
 the microSD card into either on-board QSPI flash or DDR3 memory via the IOFPGA;
 see <MB/images.txt> on the microSD card.
 
 Enter the UEFI menu by pressing Esc on the AP console as the edk2 logs start
-appearing; from here, enter the UEFI Boot Manager menu and select which media
-to boot from.
+appearing; from here, enter the UEFI Boot Manager menu and then select media
+having Ubuntu 18.04 bootable image.
+Ubuntu 18.04 will boot in two stages, onces first boot is finished reboot the board
+from MCC console.
+
+    ::
+
+             Cmd> REBOOT
+
+After this boot onwards full fledged Ubuntu 18.04 distribution will be up and running.
+Login as root and install any required packages from the console
+# apt-get install <package-name>
 
 --------------
 
