@@ -136,9 +136,7 @@ Running the software
 An FVP (Fixed Virtual Platform) of the Corstone-700 platform must be available to execute the
 included run scripts.
 
-Given an available FVP, place the FVP and its dependencies into ``<corstone700_workspace>/run-scripts/``,
-resulting in a tree akin to the following.
-
+The run-scripts structure is as below:
 ::
 
     run-scripts
