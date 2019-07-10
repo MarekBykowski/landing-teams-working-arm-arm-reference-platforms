@@ -384,9 +384,10 @@ ARMPLATDB = {
         "pdir": "n1sdp",
         "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
         "mrel": "???",
-        "mkey": "N1SDP",
+        "tagkey": "N1SDP",
         "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
-        "pbrel": "N1SDP-ALPHA2-19.07",
+        "knowntag": "N1SDP-ALPHA2-19.07",
+        "pbrel": "{knowntag}",
         "docs": "docs/{pdir}",
         "pihooks": [
           "pcie_fix", "mv_grub",
@@ -583,7 +584,8 @@ ARMPLATDB = {
         "pdir": "corstone700",
         "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
         "mrel": "???",
-        "mkey": "CORSTONE-700",
+        "tagkey": "CORSTONE-700",
+        "knowntag": "CORSTONE-700-19.02",
         "build": "yocto",
         "docs": "docs/{pdir}",
         "platsw": {
@@ -774,12 +776,12 @@ ARMPLATDB = {
       "name": "Ubuntu Server",
       "script": "ubuntu",
       "deps": [
-        "dl.fs.ubuntu",
-        "dl.fs.ubuntu.patch.0001",
-        "dl.fs.ubuntu.patch.0002",
-        "dl.fs.ubuntu.patch.0003",
-        "dl.fs.ubuntu.patch.0004",
-        "dl.fs.ubuntu.patch.0005",
+        "dl.rootfs.ubuntu",
+        "dl.rootfs.ubuntu.patch.0001",
+        "dl.rootfs.ubuntu.patch.0002",
+        "dl.rootfs.ubuntu.patch.0003",
+        "dl.rootfs.ubuntu.patch.0004",
+        "dl.rootfs.ubuntu.patch.0005",
       ],
     },
   },
@@ -1181,7 +1183,7 @@ ARMPLATDB = {
     },
 
     ### Filesystem archives
-    "fs": {
+    "rootfs": {
       "ubuntu": {
         "url": "http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current",
         "name": "bionic-base-arm64.tar.gz",
@@ -2094,14 +2096,44 @@ def get_ws_files():
 
 
 """
- " Fetch a list of tags from a remote git repository.
+ " Get sorted list of tags available for a platform
+ " Only available for platforms with special mrel="???"
 """
-def get_mtags( url ):
-    (ret, tags, err) = sh.call(["git", "ls-remote", "--refs", "--tags", url])
-    if not ret == 0:
-        script.abort("failed to query remote tags at {} ({})".format(url, err))
-    tags = tags.splitlines()
-    return [t[t.find("refs/tags/"):] for t in tags]
+def get_tags( p ):
+    if not dblu("@.mrel",p) == "???":
+        script.abort("get_tags() called on platform without mrel='???' ({})".format(p))
+
+    arp_git = "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git"
+    (knowntag, tagkey) = dblum("@", ["knowntag", "tagkey"], p)
+    os.chdir(sys.path[0])
+
+    def not_in_arp_git_error():
+        log.error("workspace sync script is not in a git clone of Arm Reference Platforms")
+        log.error("to build from source you need to `git clone {}`".format(arp_git))
+        log.error("you *can* run `python3 /path/to/sync_workspace.py` from another directory")
+        log.error("but sync_workspace.py itself must reside in a git clone of Arm Reference Platforms")
+        script.abort()
+
+    (ret, _, _) = sh.call(["git", "status"])
+    if not (ret == 0):
+        not_in_arp_git_error()
+
+    (_, remotes, _) = sh.call(["git", "remote", "-v"])
+    if not arp_git in remotes:
+        not_in_arp_git_error()
+
+    for remote in remotes.splitlines():
+        (name, url, direction) = remote.split()
+        if url == arp_git and direction == "(fetch)":
+            sh.call(["git", "remote", "update", name, "--prune"])
+            break
+
+    (_, tags, _) = sh.call(["git", "for-each-ref", "--sort=creatordate", "refs/tags", '--format="%(refname)"'])
+    tags = list(filter(lambda t: tagkey in t, tags.replace('"', "").splitlines()))
+    tags = [t[t.find(tagkey):] for t in tags]
+
+    os.chdir(sh.cwd)
+    return tags
 
 
 """
@@ -2354,15 +2386,31 @@ class config:
 
 
     def _choose_mrel():
-        (murl, mrel, mkey) = dblum("@", ["murl", "mrel", "mkey"], config.p.meta, noneAllowed=True)
+        (murl, mrel, tagkey, knowntag) = dblum("@", ["murl", "mrel", "tagkey", "knowntag"], config.p.meta, noneAllowed=True)
         if mrel == "???":
-            choices = [choice("master", descr="(may incl. interim updates)", meta="master")]
-            choices += [choice(t, meta=t) for t in list(filter(lambda t: mkey in t, get_mtags(murl)))]
+            choices = []
+            disabled_descr = "please `git checkout {}` to sync this release"
+            tags = get_tags(config.p.meta)
+            for tag in tags:
+                choices.append(choice(
+                    name=tag,
+                    meta="refs/tags/"+tag,
+                    descr=(None if tag==knowntag else disabled_descr.format(tag)),
+                    disabled=(not tag==knowntag)
+                ))
+            knowntag_index = tags.index(knowntag)
+            master_disabled_descr = "master is only available for the latest release, please `git checkout {}`".format(tags[-1])
+            choices.append(choice(
+                name="master",
+                meta="master",
+                descr=(None if knowntag_index==len(tags)-1 else master_disabled_descr),
+                disabled=(not knowntag_index==len(tags)-1)
+            ))
             mrel = prompt("Please select a manifest release tag to checkout", choices)
             config.mrel = mrel.meta
         else:
-            config.mrel = mrel
-        config._add_cfg("Tag", config.mrel)
+            config.mrel = mrel # Needs to be "refs/tags/"+mrel when we add support for LT-19.06
+        config._add_cfg("Release", config.mrel)
 
 
     def _choose_fs():
