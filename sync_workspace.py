@@ -190,7 +190,7 @@ if HOST=="Windows":
 ###
 ARMPLATDB = {
   "arm": {
-    "rel": "19.03", "pbrel": "19.01", "mrel": "19.01",
+    "rel": "19.06", "pbrel": "{rel}", "mrel": "ARMLT-{rel}",
     "cms": "developer.arm.com",
   },
 
@@ -280,7 +280,7 @@ ARMPLATDB = {
     "name": "Platforms",
 
     ### Default keys inherited by all platforms and optionally overridden
-    "murl": "https://git.linaro.org/landing-teams/working/arm/manifest",
+    "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
     "mrel": "{arm.mrel}",
     "pbrel": "{arm.pbrel}",
     "pburl": "{linaro.url}/members/arm/platforms/{pbrel}",
@@ -382,7 +382,6 @@ ARMPLATDB = {
           "oc.mb", "oc.scp", "oc.tfa", "fw.edkii", "oc.grub",
         ],
         "pdir": "n1sdp",
-        "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
         "mrel": "???",
         "tagkey": "N1SDP",
         "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
@@ -582,7 +581,6 @@ ARMPLATDB = {
       "700": {
         "name": "Corstone-700",
         "pdir": "corstone700",
-        "murl": "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest",
         "mrel": "???",
         "tagkey": "CORSTONE-700",
         "knowntag": "CORSTONE-700-19.02",
@@ -756,7 +754,6 @@ ARMPLATDB = {
         },
       },
     },
-
 
     ### Fedora Server
     "fedora": {
@@ -1214,7 +1211,7 @@ ARMPLATDB = {
     ### Prebuilt archives
     "archive": {
       "url": "{@.pburl}",
-      "md5name": "MD5SUMS",
+      "md5name": "MD5SUMS.txt",
       "dir": "{basename}",
       "name0": "{@.pdir}",
       "name3": "uboot",
@@ -1358,6 +1355,7 @@ class Database(dict):
                         if item == old_item:
                             script.abort("recursive lookup")
         if item is None and not noneAllowed:
+            log.info(d)
             script.abort("lookup of {} (plat={}) returns None but nA=False"
                          .format(key, plat))
         return item
@@ -1387,8 +1385,7 @@ class script:
     def init():
         # Parse arguments
         p = argparse.ArgumentParser()
-        p.add_argument("-v", help="[DEPRECATED] verbosity", action="count",
-                       default=0)
+        p.add_argument("-D", help="Debug mode", action="store_true")
         p.add_argument("--qa_mode", help="for Arm internal QA purposes",
                        action="store_true")
         p.add_argument("--no_check_apt_deps", action="store_true",
@@ -1396,21 +1393,18 @@ class script:
         args = p.parse_args()
         (script.qa_mode, script.no_check_apt_deps) = \
             (args.qa_mode, args.no_check_apt_deps)
-        if args.v > 0:
-            print("[WARN] the -v flag is deprecated")
         # Configure logging
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
         fmt = logging.Formatter("%(levelname)s: %(message)s")
         console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
+        console.setLevel(logging.DEBUG if args.D else logging.INFO)
         console.setFormatter(fmt)
         logfile = logging.FileHandler("log.txt", "w")
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(fmt)
         logger.addHandler(console)
         logger.addHandler(logfile)
-        log.info("Arm Reference Platforms Software {}".format(dblu("arm.rel")))
         log.info("date is {}".format(time.strftime('%Y-%m-%d %H:%M:%S')))
         log.info("running on {} host".format(HOST))
         # Other setup
@@ -1958,7 +1952,7 @@ def tree_prompt( title, root ):
         if len(root.children)==1:
             root = root.children[0]
             if not last_only_avail == root.name:
-              log.warn("only avail. option is "+root.name)
+              log.info("only available option is "+root.name)
               last_only_avail = root.name
         else:
             root = prompt(title, root.children)
@@ -2409,7 +2403,7 @@ class config:
             mrel = prompt("Please select a manifest release tag to checkout", choices)
             config.mrel = mrel.meta
         else:
-            config.mrel = mrel # Needs to be "refs/tags/"+mrel when we add support for LT-19.06
+            config.mrel = "refs/tags/"+mrel
         config._add_cfg("Release", config.mrel)
 
 
