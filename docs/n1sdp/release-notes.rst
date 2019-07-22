@@ -9,19 +9,19 @@ Release Notes
 
 Features and Fixes
 ------------------
-The following is a summary of the key software features of the ALPHA2 release.
+The following is a summary of the key software features of the N1SDP-ALPHA2-CCIX-19.07 release.
 
-- All 4 Neoverse N1 cores running at 2.4 GHz.
-- PCIe Link speed now support GEN3 - 8 GT/s.
-- Multicore SMP Linux 5.1 kernel.
-- Full blown Ubuntu 18.04 distribution supported now.
-- SMMUv3 enabled to support PCIe ATS.
-- EDK2/EDK2-Platforms rebased from github. ACPI Tables updated to expose SMMU to kernel.
-- Multi-segment support enabled. Now the CCIX RC and PCIe RC are both enabled, hence normal PCIe card will
-  be functional in any of the PCIe/CCIX open slot available on the board from Linux.
-- PCIe card hosting a switch is supported on the PCIe slot behind the PLX switch.
-- DDR speed enhanced to 2667 MTS. Single rank 8 GB per DIMM (Total 16 GB RAM) supported.
-- Boot sequence optimized to improve the boot time.
+- Support for CCIX parser following CCIX software specification added in EDK2
+- Reference CCIX platform library added in EDK2-Platforms
+- Validated CCIX parser and platform library with remote Requesting Agent (RA)
+  design programmed in Xilinx Alveo U280 accelerator FPGA card
+- For all CCIX specific documents please refer to the following link
+  https://www.ccixconsortium.com/ccix-library/
+  Please contact CCIX consortium to get access to the documents if not already available
+
+Note:
+This release is an add-on to the ALPHA2 release published before.
+For ALPHA2 release features, please refer to ALPHA2 release notes.
 
 Precautions
 -----------
