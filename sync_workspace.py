@@ -2376,7 +2376,7 @@ class config:
         config._update_includes(config.k.meta)
         if not dblu(config.k.meta+".maps", noneAllowed=True):
             config.manifest = dblu(config.k.meta+".manifest", config.p.meta)
-            config._choose_mrel()
+        config._choose_mrel()
 
 
     def _choose_mrel():
