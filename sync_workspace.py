@@ -2101,7 +2101,7 @@ def get_tags( p ):
     if not dblu("@.mrel",p) == "???":
         script.abort("get_tags() called on platform without mrel='???' ({})".format(p))
 
-    arp_git = "https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git"
+    arp_git = "git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git"
     (knowntag, tagkey) = dblum("@", ["knowntag", "tagkey"], p)
     os.chdir(sys.path[0])
 
@@ -2122,7 +2122,7 @@ def get_tags( p ):
 
     for remote in remotes.splitlines():
         (name, url, direction) = remote.split()
-        if url == arp_git and direction == "(fetch)":
+        if arp_git in url and direction == "(fetch)":
             sh.call(["git", "remote", "update", name, "--prune"])
             break
 
