@@ -17,7 +17,7 @@ instead of using ``sync_workspace.py``:
 - System Guidance for Infrastructure (SGI): `SGI-575 <sgi575/user-guide.rst>`__
 
 - Neoverse(TM) Reference Design (RD): `RD-N1-Edge <rdn1edge/user-guide.rst>`__,
-  `RD-E1-Edge <rde1edge/user-guide.rst>`__
+  `RD-E1-Edge <rde1edge/user-guide.rst>`__, `RD-Daniel <rddaniel/user-guide.rst>`__
 
 Please use the links above to sync a software stack for one of these platforms.
 
