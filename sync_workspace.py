@@ -286,6 +286,7 @@ ARMPLATDB = {
     "pburl": "{linaro.url}/members/arm/platforms/{pbrel}",
     "docs": "https://community.arm.com/oss-platforms/w/docs/",
     "build": "arm",
+    "bsgroup": "configs",
     "pihooks": "null",
     "type": "null",
     "ack": {
@@ -382,6 +383,7 @@ ARMPLATDB = {
           "oc.mb", "oc.scp", "oc.tfa", "fw.edkii", "oc.grub",
         ],
         "pdir": "n1sdp",
+        "bsgroup": "platforms",
         "mrel": "???",
         "tagkey": "N1SDP",
         "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
@@ -2177,37 +2179,54 @@ class config:
             sh.fetch(d, plat=config.p.meta)
         if config.manifest:
             force_fresh = False
+            finished = False
             arm_build = dblu("@.build", config.p.meta) == "arm"
-            sh.reposync( config.manifest, config.p.meta, config.mrel, force_fresh )
-            if arm_build:
-                while True:
-                    for (_, dirs, _) in os.walk("build-scripts/platforms"):
+            while not finished:
+                sh.reposync( config.manifest, config.p.meta, config.mrel, force_fresh )
+                if not arm_build:
+                    finished = True
+                else:
+                    ### Get list of platform script directories
+                    bsgroup = dblu("@.bsgroup", config.p.meta)
+                    for (_, dirs, _) in os.walk("build-scripts/"+bsgroup):
                         break  # don't recursively walk
+
+                    ### Get list of filesystem scripts
                     for (_, _, files) in os.walk("build-scripts/filesystems"):
                         break  # don't recursively walk
-                    if dirs and files:
-                        break
+
+
+                    ### If something goes wrong during repo sync (e.g. losing internet connection),
+                    ### the build-scripts/platforms and build-scripts/filesystems directories are
+                    ### usually either missing or empty, so we can use these as a litmus test for
+                    ### a corrupted workspace
+                    ok = True
+                    try:
+                        if not dirs or not files:
+                            ok = False
+                    except UnboundLocalError:
+                        ok = False
+
+                    if ok:
+                        ### Cull any scripts/directories not matching chosen config, enabling user to run
+                        ### `./build-scripts/build-all.sh all` without needing to pass the platform/filesystem
+                        for d in dirs:
+                            if not (d=="common" or d==dblu(config.p.meta+".pdir")):
+                                sh.rmdir("build-scripts/{}/{}".format(bsgroup, d))
+                        preserve = dblu(config.fs.meta+".script") if config.env.meta=="k" else dblu(config.fw.meta+".stubfs")
+                        for f in files:
+                            if not f==preserve:
+                                sh.rm("build-scripts/filesystems/"+f)
+                        finished = True
                     else:
-                        log.error("detected missing files/folders in build-scripts/")
+                        log.error("detected missing files/folders in build-scripts/ directory")
                         log.error("repo may be in an invalid/corrupt state")
                         log.error("did you lose internet connection during sync?")
-                        msg = ("Detected potential invalid/corrupt repo state, try "
-                               "to sync again?")
-                        if not prompt(msg,
-                            [choice("Yes", True), choice("No", False)]
-                        ).meta:
-                            sys.exit(0)
+                        msg = "Detected potential invalid/corrupt repo state, try to sync again?"
+                        if not prompt(msg, [choice("Yes", True), choice("No", False)]).meta:
+                            sys.exit(1)
+                        [sh.rmdir(f) if f.endswith("/") else sh.rm(f) for f in get_ws_files()]
                         force_fresh = True
-                        filelist = get_ws_files()
-                        [sh.rmdir(f) if f.endswith("/") else sh.rm(f) for f in filelist]
-                for d in dirs:
-                    if not (d=="common" or d==dblu(config.p.meta+".pdir")):
-                        sh.rmdir("build-scripts/platforms/"+d)
-                preserve = dblu(config.fs.meta+".script") if config.env.meta=="k" \
-                      else dblu(config.fw.meta+".stubfs")
-                for f in files:
-                    if not f==preserve:
-                        sh.rm("build-scripts/filesystems/"+f)
         hooks = dblu("@.pihooks", config.p.meta, noneAllowed=True)
         if hooks:
             [pihooks.__dict__[h]() for h in hooks]
