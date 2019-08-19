@@ -72,6 +72,7 @@ The following platforms are supported:
 - System Guidance for Mobile (SGM): `SGM-775 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/388/system-guidance-for-mobile-sgm>`__
 - `TC2 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/227/tc2>`__
 - `Corstone-700 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/444/corstone-700>`__
+- `Cortex A5 DesignStart <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/447/cortex-a5-designstart>`__
 
 The following platforms are also supported, but currently require users to
 manually sync the software stack sources:
