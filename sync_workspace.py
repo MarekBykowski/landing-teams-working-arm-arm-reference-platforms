@@ -598,7 +598,38 @@ ARMPLATDB = {
         ],
         "pb": "null",
         "includes": [
-          "oc.tfa", "oc.tiny", "oc.cmsis",
+          "oc.tfa", "oc.uboot", "oc.tiny", "oc.cmsis",
+        ],
+        "excludes": [
+          "fw.platsw", # Hide it from final configuration summary
+        ],
+      },
+    },
+
+    ### DesignStart
+    "ds": {
+      "name": "DesignStart",
+
+      ### Cortex-A5 DesignStart
+      "a5": {
+        "name": "Cortex-A5 DesignStart",
+        "pdir": "ca5ds",
+        "mrel": "???",
+        "tagkey": "CA5-DESIGNSTART",
+        "knowntag": "{tagkey}-19.03",
+        "build": "yocto",
+        "docs": "docs/{pdir}",
+        "platsw": {
+          "manifest": "{pdir}.xml",
+        },
+        "k": "null",
+        "fs": "null",
+        "fw": [
+          "fw.platsw",
+        ],
+        "pb": "null",
+        "includes": [
+          "oc.tfa", "oc.uboot", "oc.tiny",
         ],
         "excludes": [
           "fw.platsw", # Hide it from final configuration summary
@@ -611,7 +642,7 @@ ARMPLATDB = {
     "all": [
       "p.board.juno.64b", "p.board.juno.legacy", "p.board.tc2",
       "p.fvp.v8a.base.64b", "p.fvp.v8a.base.legacy", "p.fvp.v8a.fndn.64b",
-      "p.fvp.sg.m.775", "p.board.n1sdp", "p.corstone.700",
+      "p.fvp.sg.m.775", "p.board.n1sdp", "p.corstone.700", "p.ds.a5",
     ],
   },
 
@@ -1044,7 +1075,7 @@ ARMPLATDB = {
     ### Tiny Linux
     "tiny": {
       "name": "Tiny Linux distribution (based on Poky-Tiny)",
-      "priority": 41,
+      "priority": 60,
     },
 
     ### CMSIS
@@ -1396,9 +1427,11 @@ class script:
                        action="store_true")
         p.add_argument("--no_check_apt_deps", action="store_true",
                        help="do not check for APT package dependencies")
+        p.add_argument("--force_unknown_tag", action="store_true",
+                       help="for Arm internal use")
         args = p.parse_args()
-        (script.qa_mode, script.no_check_apt_deps) = \
-            (args.qa_mode, args.no_check_apt_deps)
+        (script.qa_mode, script.no_check_apt_deps, script.force_unknown_tag) = \
+            (args.qa_mode, args.no_check_apt_deps, args.force_unknown_tag)
         # Configure logging
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
@@ -2415,16 +2448,28 @@ class config:
                     descr=(None if tag==knowntag else disabled_descr.format(tag)),
                     disabled=(not tag==knowntag)
                 ))
-            knowntag_index = tags.index(knowntag)
-            master_disabled_descr = "master is only available for the latest release, please `git checkout {}`".format(tags[-1])
-            choices.append(choice(
-                name="master",
-                meta="master",
-                descr=(None if knowntag_index==len(tags)-1 else master_disabled_descr),
-                disabled=(not knowntag_index==len(tags)-1)
-            ))
-            mrel = prompt("Please select a manifest release tag to checkout", choices)
-            config.mrel = mrel.meta
+            show_menu = True
+            try:
+                knowntag_index = tags.index(knowntag)
+            except ValueError:
+                if script.force_unknown_tag:
+                    config.mrel = "refs/tags/"+knowntag
+                    show_menu = False
+                else:
+                    log.error("platform {} specifies knowntag {} but this could not be found".format(config.p.meta, knowntag))
+                    log.error("has arm-reference-platforms been tagged with {} yet?".format(knowntag))
+                    log.error("you can temporarily override this error using '--force_unknown_tag'")
+                    script.abort()
+            if show_menu:
+                master_disabled_descr = "master is only available for the latest release, please `git checkout {}`".format(tags[-1])
+                choices.append(choice(
+                    name="master",
+                    meta="master",
+                    descr=(None if knowntag_index==len(tags)-1 else master_disabled_descr),
+                    disabled=(not knowntag_index==len(tags)-1)
+                ))
+                mrel = prompt("Please select a manifest release tag to checkout", choices)
+                config.mrel = mrel.meta
         else:
             config.mrel = "refs/tags/"+mrel
         config._add_cfg("Release", config.mrel)
