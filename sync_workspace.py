@@ -398,7 +398,7 @@ ARMPLATDB = {
           "k.mainline"
         ],
         "linux": {
-          "vsn": "5.1",
+          "vsn": "5.2.8",
         },
         "fs": [
           "fs.ubuntu",
@@ -779,6 +779,7 @@ ARMPLATDB = {
         "dl.rootfs.ubuntu.patch.0003",
         "dl.rootfs.ubuntu.patch.0004",
         "dl.rootfs.ubuntu.patch.0005",
+        "dl.rootfs.ubuntu.patch.0006",
       ],
     },
   },
@@ -1193,16 +1194,19 @@ ARMPLATDB = {
             "name": "0001-base-packaging.patch",
           },
           "0002": {
-            "name": "0002-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch",
+            "name": "0002-UBUNTU-SAUCE-kbuild-add-fcf-protection-none-when-usi.patch",
           },
           "0003": {
-            "name": "0003-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch",
+            "name": "0003-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch",
           },
           "0004": {
-            "name": "0004-debian-changelog.patch",
+            "name": "0004-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch",
           },
           "0005": {
-            "name": "0005-configs-based-on-Ubuntu-5.1.0-2.2.patch",
+            "name": "0005-debian-changelog.patch",
+          },
+          "0006": {
+            "name": "0006-configs-based-on-Ubuntu-5.2.0-11.12.patch",
           },
         },
       },
