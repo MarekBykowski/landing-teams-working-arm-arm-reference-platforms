@@ -19,7 +19,7 @@ All the steps mentioned below are implemented in build-scripts provided with N1S
 Building Linux Images
 ---------------------
 
-Get Linux version 4.18 or above (5.1 used in this example).
+Get Linux version 4.18 or above (5.2.8 used in this example).
 
 Two Linux images are required
 
@@ -29,8 +29,8 @@ Two Linux images are required
 **Building monolithic linux image**
  Apply n1sdp-pcie-quirk patches available inside <workspace/n1sdp-pcie-quirk/linux/0001-N1SDP-PCIe-Enablement-Quirks-for-N1SDP-PCie-controll.patch>.
  Or it could be found here https://git.linaro.org/landing-teams/working/arm/n1sdp-pcie-quirk.git/tree/linux/
-     ::
 
+    ::
          $ export ARCH=arm64
          $ export CROSS_COMPILE=/usr/bin/aarch64-linux-gnu-
          $ make defconfig
@@ -40,14 +40,15 @@ Generated Image name : Image
 
 **Building linux deb package**
 
-Along with N1SDP Quirk patches get following 5 patches from https://kernel.ubuntu.com/~kernel-ppa/mainline provided by Ubuntu and required to build linux debian package.Patches version should match with linux kernel version e.g. for 5.1 use patches under https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.1
+Along with N1SDP Quirk patches get following 6 patches from https://kernel.ubuntu.com/~kernel-ppa/mainline provided by Ubuntu and required to build linux debian package.Patches version should match with linux kernel version e.g. for 5.2.8 use patches under https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.2.8/
 
 Ubuntu Patches:
         - 0001-base-packaging.patch
-        - 0002-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch
-        - 0003-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch
-        - 0004-debian-changelog.patch
-        - 0005-configs-based-on-Ubuntu-5.1.0-2.2.patch
+        - 0002-UBUNTU-SAUCE-kbuild-add-fcf-protection-none-when-usi.patch
+        - 0003-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch
+        - 0004-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch
+        - 0005-debian-changelog.patch
+        - 0006-configs-based-on-Ubuntu-5.2.0-11.12.patch
 
 Build Commands:
      ::
@@ -59,7 +60,7 @@ Build Commands:
          $ sed -ie 's/CONFIG_DEBUG_INFO=y/# CONFIG_DEBUG_INFO is not set/' .config
          $ make bindeb-pkg
 
-Generated Image name: linux-image-5.1.0+_5.1.0+-1_arm64.deb rename it to "linux-image-n1sdp.deb"
+Generated Image name: linux-image-5.2.8+_5.2.8+-1_arm64.deb rename it to "linux-image-n1sdp.deb"
 
 Creating Ubuntu Root FS
 -----------------------------

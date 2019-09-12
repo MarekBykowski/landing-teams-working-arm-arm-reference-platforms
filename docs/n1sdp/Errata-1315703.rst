@@ -1,0 +1,29 @@
+Errata-1315703 WA disabled in Neoverse N1 SDP
+=============================================
+
+The patch https://git.linaro.org/landing-teams/working/arm/n1sdp-pcie-quirk.git/tree/arm-tf/0001-n1sdp-arm-tf-disable-workaround-for-N1-Erratum-13157.patch
+is applied by default to the N1SDP stack to disable the workaround for Erratum 1315703 so that the N1 CPU
+performance in N1SDP better reflects that of released versions of the N1 for software that does not require mitigation for Spectre Variant 4.
+
+N1DP uses N1 version r1p0, which is affected by Erratum 1315703, which
+is fixed in N1 r3p1.  The workaround for r1p0 disables the CPU performance
+feature of bypassing of stores by younger loads.  This can significantly
+affect performance.  The Erratum is classified "Cat A (Rare)" and requires
+a specific sequence of events to occur.
+
+Disabling this CPU performance feature is also the mitigation for Spectre
+Variant 4 (CVE-2018-3639).  On CPUs that provide the PSTATE.SBSS feature,
+the OS selectively applies the mitigation only to programs that require it,
+leaving the performance of other programs unaffected.  However, N1 r1p0
+does not have the PSTATE.SBSS feature (which is introduced in N1 r3p1), and
+Arm-TF does not provide the interface to to dynamically disable the CPU
+performance feature.  Therefore, applying the workaround penalizes ALL
+software running on N1 SDP, including those that do not require mitigation.
+
+This patch is meant for performance evaluation purposes ONLY and should not
+be used for software that requires a seccomp computing environment.
+
+--------------
+
+*Copyright (c) 2019, Arm Limited. All rights reserved.*
+

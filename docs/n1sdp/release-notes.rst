@@ -9,27 +9,24 @@ Release Notes
 
 Features and Fixes
 ------------------
-The following is a summary of the key software features of the N1SDP-ALPHA2-CCIX-19.07 release.
+The following is a summary of the key software features of the N1SDP-ALPHA2-PERF-19.09 release.
 
-- Support for CCIX parser following CCIX software specification added in EDK2
-- Reference CCIX platform library added in EDK2-Platforms
-- Validated CCIX parser and platform library with remote Requesting Agent (RA)
-  design programmed in Xilinx Alveo U280 accelerator FPGA card
-- For all CCIX specific documents please refer to the following link
-  https://www.ccixconsortium.com/ccix-library/
-  Please contact CCIX consortium to get access to the documents if not already available
+- ** This release is performance tuned stack.**
+- Supports dual rank 16GB DIMM and single rank 8GB DIMM @ 2667 MTS. Total 32GB or 16GB RAM could be accessible.
+- Core frequency bumped up to 2.6GHz
+- Workaround for Erratum 1315703 is disabled, so that the N1 CPU
+  performance is improved in N1SDP.This may be applied for N1 software that does not require Spectre Variant 4 mitigation.
+- Thermal shutdown supported - The system is shutdown automatically when the SOC temperature rises beyond 80 degrees.
+- SLC Cache Stashing supported for increased PCIe ingress network packet performance.
 
 Note:
-This release is an add-on to the ALPHA2 release published before.
-For ALPHA2 release features, please refer to ALPHA2 release notes.
+This release is an add-on to the N1SDP-ALPHA2-CCIX-19.07 release published before.
+For ALPHA2 release features, please refer to N1SDP-ALPHA2-CCIX-19.07 release notes.
 
 Precautions
 -----------
 - The system thermal monitoring and control features are not yet calibrated,
   therefore do not operate the unit above room temperature (approximately 25°C):
-
-  - The thermal shutdown features are currently disabled.
-  - The chassis fan speed is currently fixed.
 
 - The N1SDP is intended for use within a laboratory or engineering development
   environment. Do not use the N1SDP near equipment that is sensitive to
@@ -51,6 +48,7 @@ Following are the PCIe Cards tested - PCIe and CCIX slot:
 - TUSB7340 DEMO EVM REV C USB hub card (GEN2 x1)
 - Mellanox ConnectX-5
 - PEXSAT34 - Two sata controller behind switch (GEN2 X2)
+- Xilinx U280 CCIX card.
 
 
 Known Issues or limitations
@@ -59,14 +57,13 @@ Known Issues or limitations
   with the PCIe quirks. See the article `PCIE`_
 - PCIe/CCIX Link speed supports upto GEN3. GEN4 is yet not enabled.
 - No support for PCIe SRIOV.
-- CCIX traffic not supported over CCIX RC.
-- Currently only Micron 8GB single Rank DIMM (part number: 9ASF1G72PZ-2G6D1) is supported.
+- Currently supports only Micron 8GB/16GB single/dual Rank DIMM (part number: 9ASF1G72PZ-2G6D1) is supported.
+- There could be stability issues on long stress test of the system.
 
 Next Release Target
 -------------------
-- All 4 Neoverse N1 cores running at 3 GHz.
-- DIMM frequency 3200 MTS.
-- DIMM capacity 32 GB/Dual Rank(Total 64 GB) from Multiple Vendors.
+- Full CCIX support
+- H/W accelerator and C2C use cases over CCIX.
 
 Support
 -------
