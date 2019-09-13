@@ -616,7 +616,7 @@ ARMPLATDB = {
         "pdir": "ca5ds",
         "mrel": "???",
         "tagkey": "CA5-DESIGNSTART",
-        "knowntag": "{tagkey}-19.03",
+        "knowntag": "{tagkey}-19.09.13",
         "build": "yocto",
         "docs": "docs/{pdir}",
         "platsw": {
