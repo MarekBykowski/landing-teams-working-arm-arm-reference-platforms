@@ -1,5 +1,5 @@
-Release notes - 19.02
-=====================
+Release notes - 2019.09.23
+==========================
 
 .. section-numbering::
     :suffix: .
@@ -11,11 +11,12 @@ Components
 ----------
 The following is a summary of the key software features of the release:
 
- - Tiny linux stack built using Yocto for the Host Cortex-A processor.
+ - Tiny Linux stack built using Yocto for the Host Cortex-A processor.
  - Boot firmware with driver support for interrupt router & collator,
-   MHUv2 (Mailbox Handling Unit version 2) and Firewall.
+   MHUv2 (Mailbox Handling Unit version 2) and Boot processor and Host system
+   Firewall.
  - Automated unit test suite.
- - No software support for external system in this release.
+ - RTX RTOS software running on external system.
 
 Hardware Features
 -----------------
@@ -24,6 +25,8 @@ Hardware Features
  - Interrupt Collator
  - MHUv2 Driver
  - Boot processor Firewall
+ - Host system Firewall
+ - External system
  - REFCLK
 
 Software Features
@@ -33,22 +36,23 @@ Software Features
  - RPMSG driver in Linux
  - Interrupt Router driver in boot firmware
  - Interrupt Collator driver in boot firmware
- - MHUv2.1 Driver driver in boot firmware and Linux
- - Firewall driver in boot firmware
+ - MHUv2.1 driver in boot firmware and Linux
+ - Firewall driver in boot firmware with translation and protection extension
+ - Firewall driver in host system with protection and lock extension
+ - RTX RTOS software running on external system
  - REFCLK Timer driver in boot firmware
  - Flash Parser driver
 
 Platform Support
 ----------------
 This Software release is tested on Corstone700 Fast Model platform (FVP) and
-not on FPGA.Supported Fast model version for this release is 11.7.
-
+not on FPGA. Supported Fast model version for this release is 11.8.38
 
 Known Issues or Limitations
 ---------------------------
 
- - The provided software stack has only been tested on
-   an Arm Fixed Virtual Platform (FVP).
+ - The provided software stack has only been tested on an Arm Fixed Virtual
+   Platform (FVP).
  - No support for multiple transport protocols in MHUv2 driver.
    It supports single word in-channel message.
 

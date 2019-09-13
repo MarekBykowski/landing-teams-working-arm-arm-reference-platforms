@@ -149,7 +149,7 @@ Ensure that the FVP has its dependencies met by executing the FVP: ``./<Corstone
 All dependencies are met if the FVP launches without any errors, presenting a graphical interface
 showing information about the current state of the FVP.
 
-The ``run_model.sh`` script will provide the previously built images as arguments to the FVP, and
+The ``run_model.sh`` script in "<corstone700_workspace>/run-scripts" folder will provide the previously built images as arguments to the FVP, and
 launch the FVP. Execute the ``run_model.sh`` script:
 
 ::
@@ -162,9 +162,11 @@ launch the FVP. Execute the ``run_model.sh`` script:
 When the script is executed, three terminal instances will be launched, one for the boot processor
 processing element and two for the Host processing element.
 Once the FVP is executing, the Boot Processor will start to boot, wherein the relevant memory
-contents of the .wic file are copied to their respective memory locations within the model, and the
-host is brought out of reset.
-The host will boot linux, and present a login prompt; login using the username ``root``.
+contents of the .wic file are copied to their respective memory locations within the model,
+enforce firewall policies on memories and peripherals and then, bring the host out of reset.
+
+The host will boot trusted-firmware-a and then linux, and present a login prompt;
+login using the username ``root``.
 
 To explore some of the features of the platform, the ``test-app`` may be executed. This has been
 placed in the ``/usr/bin/`` directory.
@@ -172,10 +174,25 @@ The test application may be run with an integer argument, specifying which test 
 ::
 
     cd /usr/bin
-    ./test-app [ 1 | 2 ]
+    ./test-app [ 1 | 2 | 3 | 4 ]
 
 The test apps are as follows:
- 1. **Boot Porcessor MHU test**
+ 1. **External System reset test**
+        a. User-space application on the host system opens an endpoint corresponding to the
+           External System.
+        b. External System is then reset.
+ 2. **External System MHU test**
+        a. User-space application on the host system opens an RPMsg endpoint corresponding to the
+           MHU channel between the External System and Host and between External System and BP.
+        b. A combined message and command is written to the file descriptor associated with the
+           endpoint. This command indicates that the External System should print the received message,
+           increment the message value by 1 and transmit the message to the Host.
+        c. Once the message is received and returned to the host, the Host userspace application
+           will read from the endpoint file descriptor, and print the read value.
+        d. A combined message and command is written to the file descriptor associated with the
+           endpoint. This command indicates that the External System to increment the message value
+           by 1 and transmit the message to the BP.
+ 3. **Boot Processor MHU test**
         a. User-space application on the host system opens an RPMsg endpoint corresponding to the
            MHU channel between the Host and BP.
         b. A combined message and command is written to the file descriptor associated with the
@@ -183,7 +200,7 @@ The test apps are as follows:
            increment the message value by 1 and transmit the message to the host.
         c. Once the message is received and returned to the Host, the Host userspace application
            will read from the endpoint file descriptor, and print the read value.
- 2. **Host Timer & Interrupt Router and Collator test**
+ 4. **Host Timer & Interrupt Router and Collator test**
         a. User-space application on the host system opens an RPMsg endpoint corresponding to the
            MHU channel between the Host and BP.
         b. A command is written to the file descriptor associated with the endpoint.

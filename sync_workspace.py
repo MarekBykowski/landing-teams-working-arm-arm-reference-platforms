@@ -585,7 +585,7 @@ ARMPLATDB = {
         "pdir": "corstone700",
         "mrel": "???",
         "tagkey": "CORSTONE-700",
-        "knowntag": "CORSTONE-700-19.02",
+        "knowntag": "CORSTONE-700-2019.09.23",
         "build": "yocto",
         "docs": "docs/{pdir}",
         "platsw": {
