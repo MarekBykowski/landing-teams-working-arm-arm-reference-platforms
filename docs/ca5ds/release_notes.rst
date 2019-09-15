@@ -1,5 +1,5 @@
-Release notes - 19.03
-=====================
+Release notes - 19.09.13
+========================
 
 .. section-numbering::
     :suffix: .
@@ -38,6 +38,8 @@ Known Issues or Limitations
 
  - The provided software stack has only been tested on
    an Arm Fixed Virtual Platform (FVP).
+ - Software supports single core boot only in this
+   release.
 
 Support
 -------
