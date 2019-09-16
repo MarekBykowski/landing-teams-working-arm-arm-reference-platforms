@@ -1,5 +1,5 @@
-Release notes - 19.09.13
-========================
+Release notes - 2019.09.16
+==========================
 
 .. section-numbering::
     :suffix: .

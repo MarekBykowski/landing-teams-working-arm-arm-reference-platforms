@@ -4,8 +4,8 @@ Change Log
 This document contains a summary of the new features, changes, fixes and known
 issues in each release of Cortex A5 Design Start.
 
-Version 19.09.13
-----------------
+Version 2019.09.16
+------------------
 
 New Features
 ^^^^^^^^^^^^
