@@ -129,7 +129,7 @@ Also, ensure that the FVP has its dependencies met by executing the FVP:
 All dependencies are met if the FVP launches without any errors, presenting a graphical interface
 showing information about the current state of the FVP.
 
-The ``run_model.sh`` script in run-scripts folder will provide the previously built images as
+The ``run_model.sh`` script in "<ca5ds_workspace>/run-scripts" folder will provide the previously built images as
 arguments to the FVP, and launch the FVP.
 
 The run-scripts structure is as below:
@@ -150,4 +150,5 @@ Execute the ``run_model.sh`` script:
 When the script is executed, one terminal instances will be launched for the CA5 processing element.
 Once the FVP is executing, relevant memory contents of the .wic file are copied to their respective
 memory locations within the model, and the CPU is brought out of reset.
+
 The CPU will boot linux, and present a login prompt; login using the username ``root``.
