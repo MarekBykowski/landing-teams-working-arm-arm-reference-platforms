@@ -190,7 +190,7 @@ if HOST=="Windows":
 ###
 ARMPLATDB = {
   "arm": {
-    "rel": "19.06", "pbrel": "{rel}", "mrel": "ARMLT-{rel}",
+    "rel": "19.10", "pbrel": "{rel}", "mrel": "ARMLT-{rel}",
     "cms": "developer.arm.com",
   },
 
