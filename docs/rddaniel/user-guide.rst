@@ -15,25 +15,45 @@ RD (Reference Design) is a collection of resources to provide a representative
 view of typical compute subsystems that can be designed and implemented using
 specific generations of Arm IP.
 
-RD-Daniel Config-M includes the following Arm IP's:
+RD-Daniel supports the following configurations and those include the following
+ARM IP's:
 
-        - 16xMP1 Zeus CPUs
+        - ARM CPU:
+
+                - RD-Daniel Config M:
+                        - 16xMP1 Zeus CPUs
+
+                - RD-Daniel Config L:
+                        - 32xMP1 Zeus CPUs
+
+                - RD-Daniel Config XL:
+                        - 64xMP1 Zeus CPUs
+
         - CMN-Rhodes (with CAL): 16MB System Level Cache and 32MB Snoop Filter
         - Multiple AXI expansion ports for I/O Coherent PCIe, Ethernet, offload
         - Arm Cortex-M7 for System Control Processor (SCP) and
           Manageability Control Processor (MCP)
 
+RD-Daniel Config XL is a dual-chip configuration of Config L in which two
+RD-Daniel Config L platforms are connected through high speed CCIX link. The
+CCIX link is enabled through CMN-Rhodes's Coherent Multichip Link (CML) feature.
+
+The Fixed Virtual Platform of RD-Daniel Config XL supports 4xMP1 Zeus CPUs on
+each chips totalling to 8xMP1 Zeus CPUs. The FVP version of RD-Daniel Config XL
+is referred as RD-Daniel-Dual in this document.
+
 This document is a user guide on how to setup, build and run the software stack
-of RD-Daniel on Fixed Virtual Platform.
+of RD-Daniel and RD-Daniel-Dual on Fixed Virtual Platform.
 
 
 Host machine requirements
 -------------------------
 
 The minimum recommended host PC specification for building the software stack
-and running the RD-Daniel FVP model is a dual-core processor running at 2GHz with
-8GB of RAM. For best performance, use a machine with a quad-core processor
-running at 2.6GHz with 16GB of RAM with free hard disk space of at least 64GB.
+and running the RD-Daniel and RD-Daniel-Dual FVP model is a dual-core processor
+running at 2GHz with 8GB of RAM. For best performance, use a machine with a
+quad-core processor running at 2.6GHz with 16GB of RAM with free hard disk space
+of at least 64GB.
 
 The software package has been tested on **Ubuntu 16.04 LTS (64-bit)** and
 **Ubuntu 18.04 LTS (64-bit)**. This guide assumes that the user is on either of
@@ -43,8 +63,8 @@ this operating system.
 Repo tool setup
 ---------------
 
-The software stack for RD-Daniel is available in multiple git repositories. In
-order to simplify downloading the software stack for RD-Daniel platform, `repo tool <https://source.android.com/setup/develop/repo>`_
+The software stack for RD-Daniel and RD-Daniel-Dual is available in multiple git
+repositories. In order to simplify downloading the software stack, `repo tool <https://source.android.com/setup/develop/repo>`_
 can be used. This section explains how to setup git and repo tool.
 
 - Install Git by using the following command
@@ -81,7 +101,7 @@ Syncing the software stack
 --------------------------
 
 The manifest file, which contains the location of all the git repositories of
-RD-Daniel software stack, is available `here <https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git/>`_.
+RD-Daniel and RD-Daniel-Dual software stack, is available `here <https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git/>`_.
 This section explains how to sync the software stack.
 
 - Switch to a new folder
@@ -94,9 +114,18 @@ This section explains how to sync the software stack.
 - For obtaining the latest *stable* software stack, use the following commands
   to sync:
 
+        - For RD-Daniel:
+
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rddaniel.xml -b refs/tags/<RELEASE_TAG>
+                repo sync -j $(nproc) --fetch-submodules --force-sync
+
+        - For RD-Daniel-Dual:
+
+        ::
+
+                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rddanielx2.xml -b refs/tags/<RELEASE_TAG>
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
   Note: The RELEASE_TAG can be found in the release notes, if obtained. If
@@ -104,12 +133,22 @@ This section explains how to sync the software stack.
   "master" as the branch to checkout and pass it as the value to the "-b"
   parameter as shown in the commands below.
 
+        - For RD-Daniel:
+
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rddaniel.xml -b master
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
-This will download the RD-Daniel software stack into the ``rd-daniel`` folder.
+        - For RD-Daniel-Dual:
+
+        ::
+
+                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rddanielx2.xml -b master
+                repo sync -j $(nproc) --fetch-submodules --force-sync
+
+This will download the RD-Daniel or RD-Daniel-Dual software stack into the
+``rd-daniel`` folder.
 
 
 Installing prerequisites
@@ -153,11 +192,11 @@ to download and untar the binaries:
 This completes the setup of the GCC toolchain binaries.
 
 
-Obtaining the RD-Daniel Fast Model
-----------------------------------
+Obtaining the RD-Daniel and RD-Daniel Fast Model
+------------------------------------------------
 
-User can request for the latest version of RD-Daniel Fast Model by sending
-a email to Arm at this email address: `support-connect@arm.com <mailto:support-connect@arm.com>`_.
+User can request for the latest version of RD-Daniel and RD-Daniel-Dual Fast
+Model by sending a email to Arm at this email address: `support-connect@arm.com <mailto:support-connect@arm.com>`_.
 
 Follow the instruction in the installer and setup the FVP. Typically, the
 installer will ask to create a new folder in the home directory. You can either
@@ -173,13 +212,13 @@ path of the model as an environment variable.
 
                 export MODEL=<absolute-path-of-the-model-executable>
 
-This completes the steps to obtain the RD-Daniel Fast Model.
+This completes the steps to obtain the RD-Daniel and RD-Daniel-Dual Fast Model.
 
 
 Supported Features
 ------------------
 
-RD-Daniel software stack supports busybox boot (`Busybox`_).
+RD-Daniel and RD-Daniel-Dual software stack supports busybox boot (`Busybox`_).
 
 --------------
 
