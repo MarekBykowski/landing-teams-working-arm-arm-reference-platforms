@@ -1,5 +1,5 @@
-RD-N1-Edge platform user guide
-==============================
+RD-N1-Edge and RD-N1-Edge-Dual platform user guide
+==================================================
 
 
 .. section-numbering::
@@ -25,17 +25,23 @@ specific generations of Arm IP. RD-N1-Edge in particular is based on:
         - Arm Cortex-M7 for System Control Processor (SCP) and
           Manageability Control Processor (MCP)
 
+RD-N1-Edge also supports a dual-chip configuration in which two RD-N1-Edge
+platforms are connected through high speed CCIX link. The CCIX link is enabled
+by CMN600's Coherent Multichip Link. Such platforms are called RD-N1-Edge-Dual
+hereafter.
+
 This document is a user guide on how to setup, build and run the software stack
-of RD-N1-Edge on Fixed Virtual Platform.
+of RD-N1-Edge and RD-N1-Edge-Dual on Fixed Virtual Platform.
 
 
 Host machine requirements
 -------------------------
 
 The minimum recommended host PC specification for building the software stack
-and running the RD-N1-Edge FVP model is a dual-core processor running at 2GHz with
-8GB of RAM. For best performance, use a machine with a quad-core processor
-running at 2.6GHz with 16GB of RAM with free hard disk space of at least 64GB.
+and running the RD-N1-Edge and RD-N1-Edge-Dual FVP model is a dual-core
+processor running at 2GHz with 8GB of RAM. For best performance, use a machine
+with a quad-core processor running at 2.6GHz with 16GB of RAM with free hard
+disk space of at least 64GB.
 
 The software package has been tested on **Ubuntu 16.04 LTS (64-bit)** and
 **Ubuntu 18.04 LTS (64-bit)**. This guide assumes that the user is on either of
@@ -45,8 +51,8 @@ this operating system.
 Repo tool setup
 ---------------
 
-The software stack for RD-N1-Edge is available in multiple git repositories. In
-order to simplify downloading the software stack for RD-N1-Edge platform, `repo tool <https://source.android.com/setup/develop/repo>`_
+The software stack for RD-N1-Edge and RD-N1-Edge-Dual is available in multiple
+git repositories. In order to simplify downloading the software stack, `repo tool <https://source.android.com/setup/develop/repo>`_
 can be used. This section explains how to setup git and repo tool.
 
 - Install Git by using the following command
@@ -83,7 +89,7 @@ Syncing the software stack
 --------------------------
 
 The manifest file, which contains the location of all the git repositories of
-RD-N1-Edge software stack, is available `here <https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git/>`_.
+RD-N1-Edge and RD-N1-Edge-Dual software stack, is available `here <https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git/>`_.
 This section explains how to sync the software stack.
 
 - Switch to a new folder
@@ -96,9 +102,18 @@ This section explains how to sync the software stack.
 - For obtaining the latest *stable* software stack, use the following commands
   to sync:
 
+        - For RD-N1-Edge:
+
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edge.xml -b refs/tags/<RELEASE_TAG>
+                repo sync -j $(nproc) --fetch-submodules --force-sync
+
+        - For RD-N1-Edge-Dual:
+
+        ::
+
+                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edgex2.xml -b refs/tags/<RELEASE_TAG>
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
   Note: The RELEASE_TAG can be found in the release notes, if obtained. If
@@ -106,21 +121,39 @@ This section explains how to sync the software stack.
   "master" as the branch to checkout and pass it as the value to the "-b"
   parameter as shown in the commands below.
 
+        - For RD-N1-Edge:
+
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edge.xml -b master
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
+        - For RD-N1-Edge-Dual:
+
+        ::
+
+                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edgex2.xml -b master
+                repo sync -j $(nproc) --fetch-submodules --force-sync
 
 - For obtaining the software stack with latest *upstream updates* but which
   might not have been fully validated, use the following commands to sync:
+
+        - For RD-N1-Edge:
 
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rdn1edge.xml -b master
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
-This will download the RD-N1-Edge software stack into the ``rdn1edge`` folder.
+        - For RD-N1-Edge-Dual:
+
+        ::
+
+                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rdn1edgex2.xml -b master
+                repo sync -j $(nproc) --fetch-submodules --force-sync
+
+This will download the RD-N1-Edge or RD-N1-Edge-Dual software stack into the
+``rdn1edge`` folder.
 
 
 Installing prerequisites
@@ -164,11 +197,14 @@ to download and untar the binaries:
 This completes the setup of the GCC toolchain binaries.
 
 
-Obtaining the RD-N1-Edge Fast Model
------------------------------------
+Obtaining the RD-N1-Edge and RD-N1-Edge-Dual Fast Model
+-------------------------------------------------------
 
-User can request for the latest version of RD-N1-Edge Fast Model through
-`this page <https://developer.arm.com/products/system-design/fixed-virtual-platforms>`_
+RD-N1-Edge Fast Model version 11.8 can be downloaded from `arm developer page <https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms>`_
+(under section *Arm Neoverse FVPs*).
+
+User can request for the latest version of RD-N1-Edge and RD-N1-Edge-Dual Fast
+Models through `this page <https://developer.arm.com/products/system-design/fixed-virtual-platforms>`_
 or contact arm directly at this email address: `support-connect@arm.com <mailto:support-connect@arm.com>`_.
 
 Follow the instruction in the installer and setup the FVP. Typically, the
@@ -185,30 +221,46 @@ path of the model as an environment variable.
 
                 export MODEL=<absolute-path-of-the-model-executable>
 
-This completes the steps to obtain the RD-N1-Edge Fast Model.
+This completes the steps to obtain the RD-N1-Edge and RD-N1-Edge-Dual Fast
+Models.
 
 
 Supported Features
 ------------------
 
-RD-N1-Edge software stack supports number of tests to explore its features. To
-begin with, one can start with the busybox boot, and then try installing and
-booting various linux distribution. RD-N1-Edge is target for infrastructure
-platforms and it supports variety of infrastructure specific features. All the
-supported tests are listed below:
+RD-N1-Edge and RD-N1-Edge-Dual software stack supports number of tests to
+explore its features. To begin with, one can start with the busybox boot, and
+then try installing and booting various linux distribution. RD-N1-Edge is target
+for infrastructure platforms and it supports variety of infrastructure specific
+features.
 
-        1. Supported Filesystems:
-                   a. `Busybox`_
-                   b. `Fedora 27 Enterprise Linux Distribution`_
-                   c. `Debian 9.8.0 Enterprise Linux Distribution`_
-                   d. `Ubuntu 18.4 Enterprise Linux Distribution`_
-        2. Supported Tests:
-                   a. `ACS`_
-                   b. `KVM`_
-                   c. `RAS`_
-                   d. `Secure Boot`_
-                   e. `TFTF`_
+All the supported tests for RD-N1-Edge and RD-N1-Edge-Dual are listed below:
 
++----------------------------------------------+-------------+-----------------+
+| Filesystems                                  | RD-N1-Edge  | RD-N1-Edge-Dual |
++==============================================+=============+=================+
+| `Busybox`_                                   | Supported   | Supported       |
++----------------------------------------------+-------------+-----------------+
+| `Fedora 27 Enterprise Linux Distribution`_   | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `Debian 9.8.0 Enterprise Linux Distribution`_| Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `Ubuntu 18.4 Enterprise Linux Distribution`_ | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+
++----------------------------------------------+-------------+-----------------+
+| Tests                                        | RD-N1-Edge  | RD-N1-Edge-Dual |
++==============================================+=============+=================+
+| `ACS`_                                       | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `KVM`_                                       | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `RAS`_                                       | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `Secure Boot`_                               | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
+| `TFTF`_                                      | Supported   |                 |
++----------------------------------------------+-------------+-----------------+
 
 --------------
 
