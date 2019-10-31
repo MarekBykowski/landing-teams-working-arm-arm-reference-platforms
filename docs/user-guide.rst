@@ -89,19 +89,14 @@ The following platform user guides are maintained in this git repository:
 - `Neoverse(TM) N1 SDP <n1sdp/run-on-n1sdp.rst>`__
 - `Corstone-700 <corstone-700/user-guide.rst>`__
 - `Cortex A5 DesignStart User guide <ca5ds/user-guide.rst>`__
+- `Juno Development Board User guide <juno/user-guide.rst>`__
+- `Armv8-A Base Platform FVP User guide <basefvp/user-guide.rst>`__
+- `System Guidance for Mobile, SGM-775 FVP User guide <sgm775/user-guide.rst>`__
 
 The following platform user guides are currently still maintained on our
 `Arm Community wiki <https://community.arm.com/developer/tools-software/oss-platforms/w/docs>`__:
 
-- `Juno <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/391/run-the-arm-platforms-deliverables-on-juno>`__
-
 - `TC2 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/408/run-the-arm-platforms-deliverables-on-tc2>`__
-
-- `Armv8-A Base Platform <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/392/run-the-arm-platforms-deliverables-on-an-fvp>`__
 
 - `Armv8-A Foundation Model <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/392/run-the-arm-platforms-deliverables-on-an-fvp>`__
 
-- System Guidance for Mobile (SGM): `SGM-775 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/392/run-the-arm-platforms-deliverables-on-an-fvp>`__
-
-Note: If you wish to run Android on SGM-775, see `here <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/428/run-android-on-sgm-775>`__
-instead.
