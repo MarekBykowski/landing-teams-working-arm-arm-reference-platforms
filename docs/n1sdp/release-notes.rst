@@ -9,7 +9,7 @@ Release Notes
 
 Features and Fixes
 ------------------
-The following is a summary of the key software features of the N1SDP-ALPHA2-PERF-19.09 release.
+The following is a summary of the key software features of the tagged N1SDP-2019.09.13 release.
 
 - ** This release is performance tuned stack.**
 - Supports dual rank 16GB DIMM and single rank 8GB DIMM @ 2667 MTS. Total 32GB or 16GB RAM could be accessible.
