@@ -391,7 +391,7 @@ ARMPLATDB = {
         "pbrel": "{knowntag}",
         "docs": "docs/{pdir}",
         "pihooks": [
-          "pcie_fix", "mv_grub",
+          "build_script__ubuntu_patches", "pcie_fix", "mv_grub",
         ],
         "deps": [
           "dl.tool.gcc.scp.7", "dl.tool.gcc.a64",
@@ -807,12 +807,6 @@ ARMPLATDB = {
       "script": "ubuntu",
       "deps": [
         "dl.rootfs.ubuntu",
-        "dl.rootfs.ubuntu.patch.0001",
-        "dl.rootfs.ubuntu.patch.0002",
-        "dl.rootfs.ubuntu.patch.0003",
-        "dl.rootfs.ubuntu.patch.0004",
-        "dl.rootfs.ubuntu.patch.0005",
-        "dl.rootfs.ubuntu.patch.0006",
       ],
     },
   },
@@ -1220,28 +1214,6 @@ ARMPLATDB = {
         "name": "bionic-base-arm64.tar.gz",
         "dir": "build-scripts/prebuilts/ubuntu",
         "extract": "false",
-
-        "patch": {
-          "url": "https://kernel.ubuntu.com/~kernel-ppa/mainline/v{@.linux.vsn}",
-          "0001": {
-            "name": "0001-base-packaging.patch",
-          },
-          "0002": {
-            "name": "0002-UBUNTU-SAUCE-kbuild-add-fcf-protection-none-when-usi.patch",
-          },
-          "0003": {
-            "name": "0003-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch",
-          },
-          "0004": {
-            "name": "0004-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch",
-          },
-          "0005": {
-            "name": "0005-debian-changelog.patch",
-          },
-          "0006": {
-            "name": "0006-configs-based-on-Ubuntu-5.2.0-11.12.patch",
-          },
-        },
       },
     },
 
@@ -1870,6 +1842,13 @@ class sh:
  " Post-initialisation hooks that may be referenced by platforms in ARMPLATDB.
 """
 class pihooks():
+    """
+     " Download the Ubuntu kernel patches
+    """
+    def build_script__ubuntu_patches():
+        if config.ws.meta=="bfs":
+            sh.call(["build-scripts/helpers/ubuntu_get_kernel_patches_init"])
+
     """
      " Fix PCIe quirk on N1SDP (see docs/n1sdp/pcie-quirk.rst)
     """
