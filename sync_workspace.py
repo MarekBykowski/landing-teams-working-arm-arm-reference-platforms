@@ -402,7 +402,7 @@ ARMPLATDB = {
           "vsn": "5.2.8",
         },
         "fs": [
-          "fs.ubuntu",
+          "fs.ubuntu", "fs.busybox",
         ],
         "fw": "null",
         "pb": [
