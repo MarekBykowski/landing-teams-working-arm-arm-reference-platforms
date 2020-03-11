@@ -166,29 +166,7 @@ section for each node type's perf event selection register (at offset 0x2000 of
 each node that has a PMU).
 
 CMN-600 TRM register summary (links to all of the node types' offset registers).
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1447971081070.html
-
-
-Node-specific events are described in each node type's event selection register:
-
-* HN-F (Fully Coherent Home Node - System level cache (SLC)) por_hnf_pmu_event_sel
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1437770831882.html#gxp1532021856170
-
-* HN-I (I/O Home Node)
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1437758812361.html#ypk1532018250101
-
-* XP - por_mxp_pmu_event_sel
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1436285056624.html#dtt1532020614370
-
-* RN-D (e.g., PCI-E) - por_rnd_pmu_event_sel
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1437763783922.html#hoq1532017705521
-
-* DN (DVM Node)
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0201_00_en/bry1436285078601.html#owa1532018896006
-
-* SBSX (CHI to ACE-Lite bridge)
-    http://arminfo.emea.arm.com/help/topic/com.arm.doc.100180_0300_00_en/bry1436285181849.html#tje1532020248033
-
+    http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.100180_0201_00_en/bry1447971081070.html
 
 
 Specifying NodeID to events in perf
