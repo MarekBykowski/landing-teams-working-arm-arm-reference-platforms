@@ -98,7 +98,7 @@ the MCC console if not set then change it accordingly:
 
 **Prebuilt configuration**
 
-Copy the contents of <workspace/n1sdp-board-firmware-N1SDP-ALPHA2-19.07/n1sdp-board-firmware-N1SDP-ALPHA2-19.07/>
+Copy the contents of <workspace/n1sdp-board-firmware-N1SDP-2020.03.18/n1sdp-board-firmware-N1SDP-2020.03.18/>
 onto the mounted microSD card, then skip to the ** Booting the board ** section.
 
 **Built from source**
@@ -134,13 +134,36 @@ from MCC console.
 
              Cmd> REBOOT
 
-After this boot onwards full fledged Ubuntu 18.04 distribution will be up and running.
+The system will boot into a minimal Ubuntu 18.04 environment.
 Login as root and install any required packages from the console
 # apt-get install <package-name>
 
+Building Kernel Modules Natively
+--------------------------------
+Native building of kernel modules typically require kernel headers to be installed on the platform.
+However, a bug in deb-pkg packs the host executables rather than the target executables. This can be
+worked around by building and installing the kernel natively on the platform.
+
+  1. Boot the N1SDP board with Ubuntu filesystem and login as root.
+  2. Install build packages using following command:
+     apt-get install -y git build-essential bc bison flex libssl-dev
+  3. git clone -b n1sdp http://git.linaro.org/landing-teams/working/arm/kernel-release.git
+  4. git clone http://git.linaro.org/landing-teams/working/arm/n1sdp-pcie-quirk.git
+  5. cd kernel-release/
+  6. git am ../n1sdp-pcie-quirk/linux/\*.patch
+  7. mkdir out
+  8. cp -v /boot/config-5.4.0+  out/.config
+  9. make O=out -j4
+  10. make O=out modules_install
+  11. make O=out install
+  12. update-grub
+  13. sync
+  14. Reboot the board and when Grub menu appears, select the Advanced Boot Options -> 5.4.0 kernel
+      for booting.
+
 --------------
 
-*Copyright (c) 2019, Arm Limited. All rights reserved.*
+*Copyright (c) 2020, Arm Limited. All rights reserved.*
 
 .. _user-guide: ../user-guide.rst
 
