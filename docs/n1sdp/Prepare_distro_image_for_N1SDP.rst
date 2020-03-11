@@ -19,7 +19,7 @@ All the steps mentioned below are implemented in build-scripts provided with N1S
 Building Linux Images
 ---------------------
 
-Get Linux version 4.18 or above (5.2.8 used in this example).
+Get Linux version 4.18 or above (5.4.0 used in this example).
 
 Two Linux images are required
 
@@ -27,8 +27,8 @@ Two Linux images are required
 - Linux debian package: Installed by Ubuntu in first boot and used after second boot onwards.
 
 **Building monolithic linux image**
- Apply n1sdp-pcie-quirk patches available inside <workspace/n1sdp-pcie-quirk/linux/0001-N1SDP-PCIe-Enablement-Quirks-for-N1SDP-PCie-controll.patch>.
- Or it could be found here https://git.linaro.org/landing-teams/working/arm/n1sdp-pcie-quirk.git/tree/linux/
+ Apply n1sdp-pcie-quirk patches available inside <workspace/n1sdp-pcie-quirk/linux/>.
+ Also available here https://git.linaro.org/landing-teams/working/arm/n1sdp-pcie-quirk.git/tree/linux/
 
     ::
          $ export ARCH=arm64
@@ -40,15 +40,14 @@ Generated Image name : Image
 
 **Building linux deb package**
 
-Along with N1SDP Quirk patches get following 6 patches from https://kernel.ubuntu.com/~kernel-ppa/mainline provided by Ubuntu and required to build linux debian package.Patches version should match with linux kernel version e.g. for 5.2.8 use patches under https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.2.8/
+Along with the N1SDP Quirk patches get the following 5 patches from https://kernel.ubuntu.com/~kernel-ppa/mainline provided by Ubuntu and required to build linux debian package.Patches version should match with linux kernel version e.g. for 5.4 use patches under https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.4/
 
 Ubuntu Patches:
         - 0001-base-packaging.patch
-        - 0002-UBUNTU-SAUCE-kbuild-add-fcf-protection-none-when-usi.patch
-        - 0003-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch
-        - 0004-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch
-        - 0005-debian-changelog.patch
-        - 0006-configs-based-on-Ubuntu-5.2.0-11.12.patch
+        - 0002-UBUNTU-SAUCE-add-vmlinux.strip-to-BOOT_TARGETS1-on-p.patch
+        - 0003-UBUNTU-SAUCE-tools-hv-lsvmbus-add-manual-page.patch
+        - 0004-debian-changelog.patch
+        - 0005-configs-based-on-Ubuntu-5.4.0-7.8.patch
 
 Build Commands:
      ::
@@ -60,7 +59,7 @@ Build Commands:
          $ sed -ie 's/CONFIG_DEBUG_INFO=y/# CONFIG_DEBUG_INFO is not set/' .config
          $ make bindeb-pkg
 
-Generated Image name: linux-image-5.2.8+_5.2.8+-1_arm64.deb rename it to "linux-image-n1sdp.deb"
+Generated Image name: linux-image-5.4.0+_5.4.0+-1_arm64.deb rename it to "linux-image-n1sdp.deb"
 
 Creating Ubuntu Root FS
 -----------------------------
@@ -79,28 +78,56 @@ Do following modifications to extracted Ubuntu minimal root FS
     Content of init script
       ::
 
-         #!/bin/sh
-         mount -t proc proc /proc
-         mount -t sysfs sysfs /sys
-         mount -t sysfs sysfs /sys
-         PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
-         export PATH
-         apt-get update
-         apt-get install -y isc-dhcp-client systemd udev apt-utils resolvconf grub-efi-arm64 kmod ifupdown net-tools vim initramfs-tools
-         ln -s /dev/null /etc/systemd/network/99-default.link
-         echo "nameserver 8.8.4.4" >> /etc/resolvconf/resolv.conf.d/head
-         echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head
-         service resolvconf restart
-         echo "LABEL=Ubuntu-18.04 /  ext4 defaults 0 0" >> etc/fstab
-         echo "LABEL=ESP /boot/efi vfat defaults 0 0" >> etc/fstab
-         mkdir /boot/efi
-         mount /boot/efi
-         grub-install
-         [ -e /linux-image-n1sdp.deb ] && dpkg -i /linux-image-n1sdp.deb
-         sed -ie 's/^GRUB_TIMEOUT_STYLE=.*$/GRUB_TIMEOUT_STYLE=menu/; s/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=2/; s/GRUB_CMDLINE_LINUX_DEFAULT=.*$/GRUB_CMDLINE_LINUX_DEFAULT="earlycon"/' /etc/default/grub
-         update-grub
-         sync
-         bash
+        #!/bin/sh
+        mount -t proc proc /proc
+        mount -t sysfs sysfs /sys
+        mount -o remount,rw /
+        chown -Rf root:root /
+        chmod 777 /tmp
+        PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
+        export PATH
+        apt-get update
+        apt-get install -y isc-dhcp-client systemd udev apt-utils parted sudo resolvconf grub-efi-arm64 kmod ifupdown net-tools vim initramfs-tools openssh-server
+        # Increase ext4 partition to full disk size
+        parted /dev/sda resizepart 2 100%
+        resize2fs /dev/sda2
+        sync
+        ln -s /dev/null /etc/systemd/network/99-default.link
+        echo "nameserver 8.8.4.4" >> /etc/resolvconf/resolv.conf.d/head
+        echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head
+        service resolvconf restart
+        echo "LABEL=Ubuntu-18.04 /  ext4 defaults 0 0" >> etc/fstab
+        echo "LABEL=ESP /boot/efi vfat defaults 0 0" >> etc/fstab
+        mkdir /boot/efi
+        mount /boot/efi
+        grub-install
+        [ -e /linux-image-n1sdp.deb ] && dpkg -i /linux-image-n1sdp.deb
+        [ -e /linux-headers-n1sdp.deb ] && dpkg -i /linux-headers-n1sdp.deb
+        sed -ie 's/^GRUB_TIMEOUT_STYLE=.*$/GRUB_TIMEOUT_STYLE=menu/; s/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=2/; s/GRUB_CMDLINE_LINUX_DEFAULT=.*$/GRUB_CMDLINE_LINUX_DEFAULT="earlycon vfio-pci.ids=10ee:9038"/' /etc/default/grub
+        update-grub
+        sync
+        # change root password
+        echo "root:root" | chpasswd
+        # Create user ubuntu:ubuntu
+        adduser ubuntu --gecos "ubuntu" --disabled-password
+        echo "ubuntu:ubuntu" | chpasswd
+        usermod -aG sudo ubuntu
+        cat <<EOF >/etc/modprobe.d/vfio.conf
+        # cat /etc/modprobe.d/vfio.conf
+        options vfio-pci ids=10ee:9038
+        softdep radeon pre: vfio-pci
+        softdep amdgpu pre: vfio-pci
+        softdep nouveau pre: vfio-pci
+        softdep drm pre: vfio-pci
+        options kvm_amd avic=1
+        EOF
+        update-initramfs -u
+        cat <<EOF >/etc/modules-load.d/vfio-pci.conf
+        # cat /etc/modules-load.d/vfio-pci.conf
+        vfio-pci
+        EOF
+        sync
+        bash
 
     Content of /etc/network/interfaces
       ::
@@ -129,7 +156,7 @@ Creating Ubuntu disk Image
         set root=(hd1,msdos2)
 
         menuentry 'Booting Ubuntu on N1SDP Platform' {
-        linux /Image acpi=force ip=dhcp console=ttyAMA0,115200 root=/dev/sda2 rootwait systemd.journald.forward_to_console=no
+        linux /Image acpi=force ip=dhcp earlycon=pl011,0x2A400000 console=ttyAMA0,115200 root=/dev/sda2 rootwait
         initrd /ramdisk.img
         }
 
@@ -155,10 +182,10 @@ Booting Sequence
 
 **Second Boot**
 
-- Second boot onwards Full fledged Ubuntu-18.04 will be booted which already has a grub entry created during first boot.
+- Second boot onwards a minimal Ubuntu-18.04 will be booted which already has a grub entry created during first boot.
 - It will also use linux debian image and initramfs installed during first boot.
 
 --------------
 
-*Copyright (c) 2019, Arm Limited. All rights reserved.*
+*Copyright (c) 2020, Arm Limited. All rights reserved.*
 
