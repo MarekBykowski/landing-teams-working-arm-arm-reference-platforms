@@ -387,7 +387,8 @@ ARMPLATDB = {
         "mrel": "???",
         "tagkey": "N1SDP",
         "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
-        "pbrel": "N1SDP-2019.09.13",
+        "knowntag": "N1SDP-2020.03.26",
+        "pbrel": "{knowntag}",
         "docs": "docs/{pdir}",
         "pihooks": [
           "build_script__ubuntu_patches", "pcie_fix", "mv_grub",
@@ -399,7 +400,7 @@ ARMPLATDB = {
           "k.mainline"
         ],
         "linux": {
-          "vsn": "5.2.8",
+          "vsn": "5.4.0",
         },
         "fs": [
           "fs.ubuntu", "fs.busybox",
@@ -2115,7 +2116,7 @@ def get_tags( p ):
         script.abort("get_tags() called on platform without mrel='???' ({})".format(p))
 
     arp_git = "git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git"
-    tagkey = dblu("@.tagkey", p)
+    (knowntag, tagkey) = dblum("@", ["knowntag", "tagkey"], p)
     os.chdir(sys.path[0])
 
     def not_in_arp_git_error():
@@ -2428,7 +2429,7 @@ class config:
                 ))
             show_menu = True
             try:
-                knowntag_index = tags.index(knowntag) if not knowntag is None else len(tags)-1
+                knowntag_index = tags.index(knowntag)
             except ValueError:
                 if script.force_unknown_tag:
                     config.mrel = "refs/tags/"+knowntag
