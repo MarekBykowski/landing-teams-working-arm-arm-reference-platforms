@@ -121,10 +121,10 @@ This section explains how to sync the software stack.
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
 
-  Note: The RELEASE_TAG can be found in the release notes, if obtained. If
-  a release note is not available, or if a RELEASE_TAG is not known, use
-  "master" as the branch to checkout and pass it as the value to the "-b"
-  parameter as shown in the commands below.
+  Note: The RELEASE_TAG can be found in the `Release Tags`_ section or from the
+  release notes, if obtained. If a release note is not available, or if a
+  RELEASE_TAG is not known, use "master" as the branch to checkout and pass it
+  as the value to the "-b" parameter as shown in the commands below.
 
         ::
 
@@ -203,6 +203,26 @@ Supported Features
 ------------------
 
 RD-Daniel and RD-Daniel-XLR software stack supports busybox boot (`Busybox`_).
+
+
+Release Tags
+------------
+
+Here's the list of release tags and corresponding Fast Model version supported:
+
++-----------------------+-------------------------+----------------------------+
+| Release Tag           | RD-Daniel FVP Version   | RD-Daniel-XLR FVP Version  |
++=======================+=========================+============================+
+| RD-INFRA-2020.04.16   |        11.10.36         |          11.10.36          |
++-----------------------+-------------------------+----------------------------+
+|                       |                         |                            |
++-----------------------+-------------------------+----------------------------+
+|                       |                         |                            |
++-----------------------+-------------------------+----------------------------+
+|                       |                         |                            |
++-----------------------+-------------------------+----------------------------+
+|                       |                         |                            |
++-----------------------+-------------------------+----------------------------+
 
 --------------
 
