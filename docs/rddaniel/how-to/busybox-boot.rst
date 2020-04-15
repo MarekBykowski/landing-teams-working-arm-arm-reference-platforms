@@ -1,28 +1,28 @@
-How to build RD-Daniel and RD-Daniel-Quad platform software to validate busybox boot
-====================================================================================
+How to build RD-Daniel and RD-Daniel-XLR platform software to validate busybox boot
+===================================================================================
 
 .. section-numbering::
     :suffix: .
 
 .. contents::
 
-Busybox boot on RD-Daniel and RD-Daniel-Quad platforms
-------------------------------------------------------
+Busybox boot on RD-Daniel and RD-Daniel-XLR platforms
+-----------------------------------------------------
 
 Busybox is a lightweight executable which packages lots of POSIX compliant UNIX
 utilities in a single file system. The busybox boot test on RD-Daniel and
-RD-Daniel-Quad platforms ensures that the software stack which runs on the model
+RD-Daniel-XLR platforms ensures that the software stack which runs on the model
 is able to boot a Linux operating system with a busybox filesystem.
 
 Boot test is especially helpful when porting the software stack for new
-platforms which are derivative of the RD-Daniel or RD-Daniel-Quad platform as
+platforms which are derivative of the RD-Daniel or RD-Daniel-XLR platform as
 this test can be quickly executed to ensure that the various software components
 are properly integrated and verify the basic functionality of various software
 components. As part of this test, the following components of the software stack
 are built - *TF-A*, *UEFI*, *Linux*, *GRUB*, *SCP*.
 
 This document describes how to build and execute the boot test on the
-*RD-Daniel* and *RD-Daniel-Quad* fastmodel.
+*RD-Daniel* and *RD-Daniel-XLR* fastmodel.
 
 Procedure to build Busybox boot test for RD-Daniel and RD-Daniel platform
 -------------------------------------------------------------------------
@@ -45,7 +45,7 @@ Supported command line options are listed below
       -  Supported platforms are
 
          -  ``rddaniel`` for RD-Daniel
-         -  ``rddanielx4`` for RD-Daniel-Quad
+         -  ``rddanielxlr`` for RD-Daniel-XLR
 
    -  <command>
 
@@ -68,10 +68,10 @@ Examples of the build command are
 
    -   ::
 
-        ./build-scripts/rdinfra/build-test-busybox.sh -p rddanielx4 build
+        ./build-scripts/rdinfra/build-test-busybox.sh -p rddanielxlr build
 
       - This command performs an incremental build of the software components
-        included in the software stack for the RD-Daniel-Quad platform. Note:
+        included in the software stack for the RD-Daniel-XLR platform. Note:
         this command should be followed by the 'package' command to complete the
         preparation of the FIP and the disk image.
 
@@ -82,11 +82,11 @@ Examples of the build command are
       - This command packages the previously built software stack and prepares
         the FIP and the disk image.
 
-Procedure for validating Busybox boot test for RD-Daniel and RD-Daniel-Quad platforms
--------------------------------------------------------------------------------------
+Procedure for validating Busybox boot test for RD-Daniel and RD-Daniel-XLR platforms
+------------------------------------------------------------------------------------
 
 After the build for busybox boot test is complete, the following command starts
-the execution of the *RD-Daniel* or *RD-Daniel-Quad* fastmodel and the software
+the execution of the *RD-Daniel* or *RD-Daniel-XLR* fastmodel and the software
 boots up to the busybox prompt. Examples on how to use the command are listed
 below.
 
@@ -105,7 +105,7 @@ Supported command line options are listed below
       - Specifies the platform to build. Supported platforms are
 
          -  ``rddaniel`` for RD-Daniel
-         -  ``rddanielx4`` for RD-Daniel-Quad
+         -  ``rddanielxlr`` for RD-Daniel-XLR
 
    -  -n [true|false] (optional)
 
@@ -124,9 +124,9 @@ Example commands to validate the Boot test are as listed below.
 
    -   ::
 
-        ./boot.sh -p rddanielx4
+        ./boot.sh -p rddanielxlr
 
-      - This command starts the execution of the RD-Daniel-Quad model and the
+      - This command starts the execution of the RD-Daniel-XLR model and the
         software boots up to the Busybox prompt.
 
    -   ::
@@ -149,4 +149,4 @@ Example commands to validate the Boot test are as listed below.
 
 --------------
 
-*Copyright (c) 2019, Arm Limited. All rights reserved.*
+*Copyright (c) 2019-2020, Arm Limited. All rights reserved.*
