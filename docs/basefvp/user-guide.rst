@@ -20,7 +20,7 @@ Host machine requirements
 -------------------------
 
 The software package has been tested on **Ubuntu 16.04 LTS (64-bit)**
-Install python3-pyelftools 
+Install python3-pyelftools
 
 
 Repo tool setup
@@ -64,7 +64,7 @@ This completes the setup of repo tool.
 Obtaining Armv8-A Base Platform FVP
 -----------------------------------
 
-Armv8-A Base Platform FVP can be downloaded from 
+Armv8-A Base Platform FVP can be downloaded from
 `here <https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms>`_.
 
 
@@ -84,18 +84,27 @@ Sync, Build and Run Busybox on Armv8-A Base Platform FVP
 ---------------------------------------------------------
 This description outlines steps to boot latest stable kernel version 5.3 on Armv8-A Base Platform FVP with Busybox filesystem.
 
-        ::
+
         Software sync can be done in two methods:
-        Method 1
+
+        Method 1:
+
+        ::
+
                 git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
                 cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps 
-                Follow the menu options to sync Busybox for FVP
+                python3 sync_workspace.py  --no_check_apt_deps
+
+        Follow the menu options to sync Busybox for FVP
+
         NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
 
         OR
 
-        Method 2
+        Method 2:
+
+        ::
+
                 # Move to the platform directory
                 mkdir platform
                 cd platform
@@ -112,13 +121,19 @@ This description outlines steps to boot latest stable kernel version 5.3 on Armv
                 wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/arm-linux-gnueabihf/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
                 tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
 
-                # Optional: Enable /etc/network in busybox
-                Enable FEATURE_ETC_NETWORKS in busybox/libbb/Config.src
+        # Optional: Enable /etc/network in busybox
+        Enable FEATURE_ETC_NETWORKS in busybox/libbb/Config.src
 
         # Build
+
+        ::
+
                 ./build-scripts/build-all.sh -p fvp -f busybox all
 
         # Run
+
+        ::
+
                 export INITRD=output/fvp/fvp-busybox/uboot/ramdisk.img
                 export IMAGE=output/fvp/fvp-busybox/uboot/Image
                 export BL1=output/fvp/fvp-busybox/uboot/bl1.bin
@@ -131,19 +146,28 @@ This description outlines steps to boot latest stable kernel version 5.3 on Armv
 Sync, Build and Run OE on Armv8-A Base Platform FVP
 ---------------------------------------------------
 This description outlines steps to boot latest stable kernel version 5.3 on Armv8-A Base Platform FVP with OE (LAMP) filesystem.
-       
-        ::
+
+
         Software sync can be done in two methods:
-        Method 1
+
+        Method 1:
+
+        ::
+
                 git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
                 cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps 
-                Follow the menu options to sync OE for FVP
+                python3 sync_workspace.py  --no_check_apt_deps
+
+        Follow the menu options to sync OE for FVP
+
         NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
 
         OR
 
-        Method 2
+        Method 2:
+
+        ::
+
                 # Move to the platform directory
                 mkdir platform
                 cd platform
@@ -183,18 +207,27 @@ This description outlines steps to boot latest stable kernel version 5.3 on Armv
 Sync, Build and Run Android-N on Armv8-A Base Platform FVP
 ----------------------------------------------------------
 This description outlines steps to boot Android N (7.0-16.10) filesystem on Armv8-A Base Platform FVP.
-       
-        ::
+
         Software sync can be done in two methods:
-        Method 1
+
+        Method 1:
+
+        ::
+
                 git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
                 cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps 
-                Follow the menu options to sync Android for FVP
+                python3 sync_workspace.py  --no_check_apt_deps
+
+        Follow the menu options to sync Android for FVP
+
         NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
+
         OR
 
-        Method 2
+        Method 2:
+
+        ::
+
                 # Move to the platform directory
                 mkdir platform
                 cd platform
@@ -220,15 +253,19 @@ This description outlines steps to boot Android N (7.0-16.10) filesystem on Armv
                 wget http://releases.linaro.org/android/reference-lcr/fvp/7.0-16.10/ramdisk.img
 
         # Build
+        ::
+
                 ./build-scripts/build-all.sh -p fvp -f android all
 
         # Run
+        ::
+
                 export INITRD=prebuilts/android/fvp/ramdisk.img
                 export IMAGE=output/fvp/fvp-android/uboot/Image
                 export BL1=output/fvp/fvp-android/uboot/bl1.bin
                 export FIP=output/fvp/fvp-android/uboot/fip.bin
                 export DTB=output/fvp/fvp-android/uboot/fvp-base-aemv8a-aemv8a-t1.dtb
-                
+
                 cd model-scripts/fvp
                 ./run_model.sh
 
@@ -237,22 +274,28 @@ Enable network on FVP
 
 To enable network on FVP, follow below steps
 
-1. Create network bridge and add the host PC network as its interface
-sudo apt-get install bridge-utils
-sudo brctl addbr br0
-sudo brctl addif br0 <host network interface name>
-sudo ifconfig <host network interface name> 0.0.0.0
-sudo ifconfig br0 up
-sudo dhclient br0
+1. Create network bridge and add the host PC network as its interface:
+        ::
 
-2. Add the tap interface
-sudo ip tuntap add dev <bridge_interface_name> mode tap user $(whoami)
-sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
-sudo brctl addif br0 <bridge_interface_name>
+                sudo apt-get install bridge-utils
+                sudo brctl addbr br0
+                sudo brctl addif br0 <host network interface name>
+                sudo ifconfig <host network interface name> 0.0.0.0
+                sudo ifconfig br0 up
+                sudo dhclient br0
 
-3. Add below parameters in run_model.sh
--C bp.hostbridge.interfaceName=<bridge_interface_name> 
--C bp.smsc_91c111.enabled=1 
+2. Add the tap interface:
+        ::
+
+                sudo ip tuntap add dev <bridge_interface_name> mode tap user $(whoami)
+                sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
+                sudo brctl addif br0 <bridge_interface_name>
+
+3. Add below parameters in run_model.sh:
+        ::
+
+                -C bp.hostbridge.interfaceName=<bridge_interface_name>
+                -C bp.smsc_91c111.enabled=1
 
 4. ./run_model.sh
 
@@ -264,12 +307,13 @@ Build: Use platform selection as fvp32 in build steps explained above.
        Note: Output files become available at output/fvp32 folder. Set environment variables like IMAGE accordingly.
 
 Run: Pass aarch32 argument to run_mode.sh
-     ./run_model.sh --aarch32
+        ::
+
+              ./run_model.sh --aarch32
+
 Note: Android boot is not supported on AArch32 builds
 
 --------------
 
-*Copyright (c) 2019, Arm Limited. All rights reserved.*
-
-
+*Copyright (c) 2019-2020, Arm Limited. All rights reserved.*
 
