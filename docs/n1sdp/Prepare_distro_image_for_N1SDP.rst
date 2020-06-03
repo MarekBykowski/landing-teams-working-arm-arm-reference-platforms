@@ -64,34 +64,66 @@ Generated Image name: linux-image-5.4.0+_5.4.0+-1_arm64.deb rename it to "linux-
 Creating Ubuntu Root FS
 -----------------------------
 
-Download Ubuntu minimal root file system image from "http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current/bionic-base-arm64.tar.gz"
-This image will be extracted and modified to boot full fledged Ubuntu 18.04 distro.
+Download the Ubuntu minimal root file system image from
+"http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current/bionic-base-arm64.tar.gz".
+This image will be extracted and modified to boot a fully fledged Ubuntu 18.04
+distro.
 
-Do following modifications to extracted Ubuntu minimal root FS
-      ::
+An initramfs is provided containing the necessary firmware and hardware support.
+The initramfs PID 1 should configure the network interface and then
+execute the installation script.
 
-          Create a init script in /bin/init required for first boot.
-          Clear root password(so that we can actually login) from /etc/passwd.
-          Add nameserver 8.8.8.8 in /etc/resolv.conf
-          Create /etc/network/interfaces with following content
+During the first boot an installation script will configure a minimal working
+base-system.
 
-    Content of init script
-      ::
+The provided installation script preforms the following tasks:
+
+- Set root as password for root
+- Add 8.8.4.4 and 8.8.8.8 as nameservers
+- Resize the second partion (and file-system) to end of disk
+- Install a minimal set of package with apt-get
+
+
+Content of the provided installation script (assumes that network is up):
+    ::
 
         #!/bin/sh
+
+        on_exit() {
+            test $? -ne 0 || exit 0
+            echo "something unexpected happend, bailing to a recovery shell!" >&2
+            exec /bin/bash
+        }
+
+        trap "on_exit" EXIT TERM
+
+        set -u
+        set -e
+
         mount -t proc proc /proc
         mount -t sysfs sysfs /sys
         mount -o remount,rw /
-        chown -Rf root:root /
+        chown -Rf root:root / || true
         chmod 777 /tmp
         PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
         export PATH
         apt-get update
-        apt-get install -y isc-dhcp-client systemd udev apt-utils parted sudo resolvconf grub-efi-arm64 kmod ifupdown net-tools vim initramfs-tools openssh-server
-        # Increase ext4 partition to full disk size
-        parted /dev/sda resizepart 2 100%
-        resize2fs /dev/sda2
-        sync
+        apt-get install -y \
+        	apt-utils \
+        	grub-efi-arm64 \
+        	ifupdown \
+        	initramfs-tools \
+        	isc-dhcp-client \
+        	kmod \
+        	linux-firmware \
+        	net-tools \
+        	openssh-server \
+        	resolvconf \
+        	sudo \
+        	systemd \
+        	udev \
+        	vim \
+
         ln -s /dev/null /etc/systemd/network/99-default.link
         echo "nameserver 8.8.4.4" >> /etc/resolvconf/resolv.conf.d/head
         echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head
@@ -100,7 +132,7 @@ Do following modifications to extracted Ubuntu minimal root FS
         echo "LABEL=ESP /boot/efi vfat defaults 0 0" >> etc/fstab
         mkdir /boot/efi
         mount /boot/efi
-        grub-install
+        grub-install || true
         [ -e /linux-image-n1sdp.deb ] && dpkg -i /linux-image-n1sdp.deb
         [ -e /linux-headers-n1sdp.deb ] && dpkg -i /linux-headers-n1sdp.deb
         sed -ie 's/^GRUB_TIMEOUT_STYLE=.*$/GRUB_TIMEOUT_STYLE=menu/; s/^GRUB_TIMEOUT=.*$/GRUB_TIMEOUT=2/; s/GRUB_CMDLINE_LINUX_DEFAULT=.*$/GRUB_CMDLINE_LINUX_DEFAULT="earlycon vfio-pci.ids=10ee:9038"/' /etc/default/grub
@@ -127,40 +159,39 @@ Do following modifications to extracted Ubuntu minimal root FS
         vfio-pci
         EOF
         sync
-        bash
 
-    Content of /etc/network/interfaces
-      ::
+Content of /etc/network/interfaces
+     ::
 
-        # Network setup
-        # interfaces(5) file used by ifup(8) and ifdown(8)
-        auto eth0
-        iface eth0 inet dhcp
+         #!/bin/sh
+         # Network setup
+         # interfaces(5) file used by ifup(8) and ifdown(8)
+         auto eth0
+         iface eth0 inet dhcp
 
 
 Creating Ubuntu disk Image
 --------------------------
-- Create "grub-ubuntu.img" disk image which will have two partitions, first a FAT partition of 20MB and second an EXT3 partiton of 8GB.
+- Create "grub-ubuntu.img" disk image which will have two partitions, first a
+  FAT partition of 20MB and second an EXT4 partiton of 4GB.
 
-- FAT partition labeled as ESP which contains grub configuration for first boot.
+- FAT partition labeled as ESP which contains grub configuration for **first** boot.
+  ::
 
-    content of grub configuration: used during first boot only
-      ::
+      set debug="loader,mm"
+      set term="vt100"
+      set default="0"
+      set timeout="1"
 
-        # Network setup
-        set debug="loader,mm"
-        set term="vt100"
-        set default="0"
-        set timeout="1"
+      set root=(hd1,msdos2)
 
-        set root=(hd1,msdos2)
+      menuentry 'Install Ubuntu on N1SDP Platform' {
+      	linux /Image acpi=force earlycon=pl011,0x2A400000
+      	initrd /ramdisk.img
+      }
 
-        menuentry 'Booting Ubuntu on N1SDP Platform' {
-        linux /Image acpi=force ip=dhcp earlycon=pl011,0x2A400000 console=ttyAMA0,115200 root=/dev/sda2 rootwait
-        initrd /ramdisk.img
-        }
-
-- EXT3 partition labeled as Ubuntu-18.04 which contains extracted Ubuntu-18.04 root file system created earlier along with both kernel images and initrd.
+- EXT4 partition labeled as Ubuntu-18.04 which contains extracted Ubuntu-18.04
+  root file system created earlier along with both kernel images and initramfs.
 
 Mounting of disk Image on memory stick
 --------------------------------------
@@ -176,9 +207,13 @@ Booting Sequence
 ----------------
 **First Boot**
 
-- grub configuration kept inside ESP partition will be used.
-- Monolithic kernel image and initrd will be used.
-- /bin/init will be used which will install linux deb package create a new initramfs and grub entry.
+- The GRUB configuration stored on the ESP partition is used
+- The monolithic kernel image and initramfs are used
+- /init configures the network and mount the real root
+- /init executes the installation script
+- The installation script installs the base packages
+- The installation script installs the Linux deb package and creates a
+  new initramfs and grub entry
 
 **Second Boot**
 
