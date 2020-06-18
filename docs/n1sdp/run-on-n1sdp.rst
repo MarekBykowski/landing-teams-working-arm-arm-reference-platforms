@@ -98,8 +98,11 @@ the MCC console if not set then change it accordingly:
 
 **Prebuilt configuration**
 
-Copy the contents of <workspace/n1sdp-board-firmware-N1SDP-2020.03.18/n1sdp-board-firmware-N1SDP-2020.03.18/>
-onto the mounted microSD card, then skip to the ** Booting the board ** section.
+Copy the contents of
+<workspace/n1sdp-board-firmware-${RELEASE_TAG}/n1sdp-board-firmware-${RELEASE_TAG}/
+onto the mounted microSD card, then skip to the ** Booting the board **
+section.
+
 
 **Built from source**
 
