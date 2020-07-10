@@ -62,6 +62,7 @@ The following platforms support different build systems
 
 * Corstone-700 : `Corstone-700 User guide <corstone-700/user-guide.rst>`__
 * Cortex A5 DesignStart : `Cortex A5 DesignStart User guide <ca5ds/user-guide.rst>`__
+* Total Compute(TC0) : `Total Compute User guide <tc0/user-guide.rst>`__
 
 For Other platforms:
 
@@ -92,6 +93,7 @@ The following platform user guides are maintained in this git repository:
 - `Juno Development Board User guide <juno/user-guide.rst>`__
 - `Armv8-A Base Platform FVP User guide <basefvp/user-guide.rst>`__
 - `System Guidance for Mobile, SGM-775 FVP User guide <sgm775/user-guide.rst>`__
+- `Total Compute(TC0) User guide <tc0/user-guide.rst>`__
 
 The following platform user guides are currently still maintained on our
 `Arm Community wiki <https://community.arm.com/developer/tools-software/oss-platforms/w/docs>`__:
