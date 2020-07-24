@@ -9,6 +9,32 @@ Change Log
 This document contains a summary of the incremental features, changes, fixes and known
 issues in each release of N1SDP stack. It is listed in the order of latest to oldest
 
+Tagged Version - N1SDP-2020.07.27
+----------------------------------------
+New Features
+^^^^^^^^^^^^
+- Stability improvement over the GEN4 x16 link on CCIX slot. Verified with Mellanox Card (MCX516A-CDAT).
+- Switched to user space dhcp client from the kernel space dhcp client for the initial ubuntu boot.
+- Updated MCC firmware (mbb_v107) – This prompt for the recommended PMIC firmware.
+- Added new PMIC firmware (300k_8c2) – This supports for boards manufactured post Nov 2019.
+- Added latest PCC firmware (pcc_v050) – This allows to update of older boards.
+
+Known Issues and Limitations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- If either of the two boards needs to boot-up in a single chip mode with a C2C setup,
+  then the other board should be powered off.
+- PCIe root port is limited to GEN3 speed due to the on-board PCIe switch itself only supporting
+  upto GEN3 speed.
+- GEN4 x16 link in CCIX slot has not been tested for performance.
+- CCIX use-cases (Accelerator/Multichip) are limited to GEN3 speed.
+- Page Request Interface (PRI) feature is not available in both SMMUs interfacing with the
+  PCIe & CCIX root ports.
+- Currently only Micron 8GB single Rank DIMM (part number: MTA9ASF1G72PZ-2G6D1) and
+  16GB dual Rank DIMMs (part number:MTA18ASF2G72PDZ-2G6E1) are supported.
+- Multichip use-case only enables access to peripherals and PCIe endpoints in the master chip.
+- Stability issues have been observed on long stress tests of the system.
+- On-board HDMI connection is not supported for graphics output. A PCIe graphics card can be used
+  for graphics support.
 
 Tagged Version - N1SDP-2020.03.26
 ----------------------------------------

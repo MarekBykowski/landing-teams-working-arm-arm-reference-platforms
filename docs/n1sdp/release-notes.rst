@@ -9,25 +9,13 @@ Release Notes
 
 Features and Fixes
 ------------------
-The following is a summary of the key software features of the tagged N1SDP-2020.03.26 release.
+The following is a summary of the key software features of the tagged N1SDP-2020.07.27 release.
 
-- CCIX accelerator support with CCIX endpoint having a Request Agent (RA).
-    - Reference CCIX platform library in EDK2-Platforms will dynamically discover the endpoint RA topology and configures both the N1SDP host and CCIX endpoint.
-    - The framework is verified with the endpoint Requesting Agent design programmed in Xilinx Alveo U280 accelerator FPGA card.
-    - For all CCIX specific documents please refer to the CCIX consortium link: https://www.ccixconsortium.com/ccix-library/
-    - Please contact CCIX consortium to get access to the documents if not already available.
-    - Please contact Xilinx for supporting bit files and userspace applications for the Alveo-U280
-
-- Multichip SMP support over CCIX/PCIe link.
-    - Dual socket SMP boot with two N1SDP boards connected over CCIX/PCIe link.
-    - Linux sees 8 cores and DDR memories from both master and slave N1SDP boards.
-    - CCIX/PCIe link running at GEN3 x16 speed.
-
-- PCIe GEN4 x16 support in CCIX slot. GEN4 x16 link verified with Mellanox Card (MCX516A-CDAT). No performance benchmark/tuning has been done.
-- PMU counter support for CMN-600.
-- Coresight Debug/Trace support.
-- PCIe SRIOV framework support. Tested with Intel X540-T2 card.
-- Device tree support with busybox filesystem [Experimental]. Only supported when building from sources. Simple Busybox filesystem offers limited functionality.
+- Stability improvement over the GEN4 x16 link on CCIX slot. Verified with Mellanox Card (MCX516A-CDAT).
+- Switched to user space dhcp client from the kernel space dhcp client for the initial ubuntu boot.
+- Updated MCC firmware (mbb_v107) – This prompt for the recommended PMIC firmware.
+- Added new PMIC firmware (300k_8c2) – This supports for boards manufactured post Nov 2019.
+- Added latest PCC firmware (pcc_v050) – This allows to update of older boards.
 
 Precautions
 -----------
@@ -44,29 +32,31 @@ Precautions
   - Always wear a grounding strap when handling the board.
   - Avoid touching the component pins or any other metallic elements.
 
+- Update/Change board firmware only if MCC FW ask to do so,
+  see here for more information
+  https://community.arm.com/developer/tools-software/oss-platforms/w/docs/604/notice-potential-damage-to-n1sdp-boards-if-using-latest-firmware-release
+
 - Note: The case front panel USB 3.0 ports and & audio jacks are NOT connected/usable.
   They will be removed on later versions.
 
 PCIe Testing
 ------------
-Following are the PCIe Cards tested - PCIe and CCIX slot:
-
-- DW-PCIe-M2(Ver A) with Samsung EVO 970 Pro NVMe M.2 (GEN3 x4)
-- TUSB7340 DEMO EVM REV C USB hub card (GEN2 x1)
+Limited PCIe testing done on:
 - Mellanox ConnectX-5
-- PEXSAT34 - Two SATA controller behind switch (GEN2 X2)
-- Xilinx U280 CCIX card.
-
+- Xilinx U280 CCIX card
 
 Known Issues or limitations
 ---------------------------
+- If either of the two boards needs to boot-up in a single chip mode with a C2C setup,
+  then the other board should be powered off.
 - To boot a standard distribution on N1SDP platform the kernel must be patched
   with the PCIe quirks. See the article `PCIE`_
 - PCIe root port is limited to GEN3 speed due to the on-board PCIe switch supporting maximum GEN3 speed.
 - GEN4 x16 link in CCIX slot has not been performance tested.
 - CCIX usecases (Accelerator/Multichip) is limited to GEN3 speed.
 - Page Request Interface (PRI) feature is not available in both SMMUs interfaced with PCIe & CCIX root ports.
-- Currently only Micron 8GB /16GB single/dual Rank DIMMs supported (part number: 9ASF1G72PZ-2G6D1) are supported.
+- Currently only Micron 8GB single Rank DIMM (part number: MTA9ASF1G72PZ-2G6D1) and
+  16GB dual Rank DIMMs (part number:MTA18ASF2G72PDZ-2G6E1) are supported.
 - Multichip usecase does not enable peripheral access in the slave chip.
 - Stability issues have been observed on long stress tests of the system.
 - On-board HDMI connection is not supported for graphics output. PCIe graphics card can be used for graphics support.
