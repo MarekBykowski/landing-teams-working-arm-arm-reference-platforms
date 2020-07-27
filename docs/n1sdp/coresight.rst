@@ -93,8 +93,8 @@ Execute the following script to build the perf executable with open CSD library
 
 		./build-scripts/build-perf.sh
 
-This will generate the perf executable in the top directory which can then be
-transferred to the kernel running on the N1SDP board.
+This will generate the perf executable in the output/n1sdp/build_artifact/ directory which
+can then be transferred to the kernel running on the N1SDP board.
 
 Here's an example showcasing trace capture and decode of a simple application:
 
@@ -131,13 +131,13 @@ Here's an example showcasing trace capture and decode of a simple application:
 
 3. Trace the application from the start address ``0x400580`` to ``0x4006f0``
 
-   *./perf record -e cs_etm/@tmc_etr0/u --filter 'start 0x400658@test, stop 0x4006f0@test' --per-thread ./test*
+   *./perf record -e cs_etm/@tmc_etr0/u --filter 'start 0x400580@test, stop 0x4006f0@test' --per-thread ./test*
 
    This step will generate *perf.data* in the current working directory.
 
 4. Decode the trace data with perf
 
-   *perf report --stdio --dump*
+   *./perf report --stdio --dump*
 
    This step will dump all the captured trace data on stdio.
 

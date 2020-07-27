@@ -51,7 +51,7 @@ valid for N1SDP leading to issues identifying the root port during PCIe enumerat
 
 A software workaround has been added to the SCP that inserts the base address of the
 PCIe root port's configuration space as the first word in the BDF table in shared
-Non-secure SRAM in both EDK II UEFI and Linu. The generic PCIe code has been patched to
+Non-secure SRAM in both EDK II UEFI and Linux. The generic PCIe code has been patched to
 read the base address of the PCIe root port configuration space from the BDF table;
 this base address is then automatically used whenever a given BDF is all zeroes.
 
