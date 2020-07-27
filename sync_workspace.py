@@ -387,7 +387,7 @@ ARMPLATDB = {
         "mrel": "???",
         "tagkey": "N1SDP",
         "pburl": "https://git.linaro.org/landing-teams/working/arm/n1sdp-board-firmware.git/snapshot/",
-        "knowntag": "N1SDP-2020.03.26",
+        "knowntag": "N1SDP-2020.07.27",
         "pbrel": "{knowntag}",
         "docs": "docs/{pdir}",
         "pihooks": [
