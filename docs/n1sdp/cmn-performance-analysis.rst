@@ -360,4 +360,4 @@ Calculate bandwidth from perf measurement:
  4.024e6 wdata beats/second * 32 bytes/beat * 8 bits/byte = 1030e6 bits/second
 
 
-*Copyright (c) 2019, Arm Limited. All rights reserved.*
+*Copyright (c) 2019-2020, Arm Limited. All rights reserved.*
