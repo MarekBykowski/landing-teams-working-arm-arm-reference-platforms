@@ -1,6 +1,5 @@
-Armv8 Architecture FVP platform user guide
-==========================================
-
+User Guide
+==========
 
 .. section-numbering::
     :suffix: .
@@ -8,57 +7,42 @@ Armv8 Architecture FVP platform user guide
 .. contents::
 
 
-Introduction
-------------
+Notice
+------
 
-The platform includes the Architecture Envelope Model (AEM) for Armv8 and a comprehensive set of SystemIP.
-
-This document is a user guide on how to setup, build and run Linux based software stack on Armv8-A Base Platform FVP.
-
-
-Host machine requirements
--------------------------
-
-The software package has been tested on **Ubuntu 16.04 LTS (64-bit)**
-Install python3-pyelftools
+The FVP-BASE software stack uses the `Yocto project <https://www.yoctoproject.org/>`__
+to build a Board Support Package (BSP) and the Poky Linux distribution.
+The Yocto project uses `Bitbake <https://www.yoctoproject.org/docs/1.6/bitbake-user-manual/bitbake-user-manual.html>`__
+to build the software stack.
 
 
-Repo tool setup
----------------
+Prerequisites
+-------------
 
-Platform software stack comprises of various software components, spread across multiple git repositories. In
-order to simplify fetching software stack components, `repo tool <https://source.android.com/setup/develop/repo>`_
-can be used. This section explains how to setup git and repo tool.
+These instructions assume that:
+ * Your host PC is running Ubuntu Linux 18.04 LTS.
+ * You are running the provided scripts in a ``bash`` shell environment.
 
-- Install Git by using the following command
+The following utilities must be available on your host PC:
+ * chrpath
+ * compression library
+ * diffstat
+ * gawk
+ * makeinfo
+ * openssl headers
+ * pip
+ * repo
+ * yocto
 
-        ::
+To resolve these dependencies, run:
 
-                sudo apt-get install git
+::
 
-- Git installation can be confirmed by checking the version
-
-        ::
-
-                git --version
-
-  This should return the git version in a format such as ``git version 2.7.4``
-
-- Set name and email address in git
-
-        ::
-
-                git config --global user.name "<your-name>"
-                git config --global user.email "<your-email@example.com>"
-
-- Install repo tool
-
-        ::
-
-                sudo apt-get install repo
-
-This completes the setup of repo tool.
-
+    sudo apt-get update
+    sudo apt-get install chrpath gawk texinfo libssl-dev diffstat wget git-core unzip gcc-multilib \
+     build-essential socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils \
+     iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm git-lfs openssl \
+     curl libncurses-dev libz-dev python-pip repo
 
 
 Obtaining Armv8-A Base Platform FVP
@@ -73,201 +57,125 @@ Follow the instruction in the installer and setup the FVP.
 Before launching any scripts from ``model-scripts`` folder, export the absolute
 path of the model as an environment variable.
 
-        ::
+::
 
-                export MODEL=<absolute-path-of-the-model-executable>
+    export MODEL=<absolute-path-of-the-model-executable>
 
 This completes the steps to obtain Armv8-A Base Platform FVP.
 
+Syncing and building the source code
+------------------------------------
 
-Sync, Build and Run Busybox on Armv8-A Base Platform FVP
----------------------------------------------------------
-This description outlines steps to boot latest stable kernel version 5.3 on Armv8-A Base Platform FVP with Busybox filesystem.
+Create a new folder that will be your workspace, which will henceforth be referred to as ``<workspace>``
+in these instructions.
 
+::
 
-        Software sync can be done in two methods:
+    mkdir <workspace>
+    cd <workspace>
+    repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m fvp-yocto.xml -b refs/tags/BASEFVP-2020.08.06
+    repo sync -j${NUM_CPUS}
+    export DISTRO="poky"
+    export MACHINE="fvp-base"
+    source setup-environment
+    bitbake core-image-minimal
 
-        Method 1:
+The initial clean build will be lengthy, given that all host utilities are to be built as well as
+the target images. This includes host executables (python, cmake, etc.) and the required toolchain(s).
 
-        ::
+Once the build is successful, all images will be placed in the ``<workspace>/build-poky/tmp-poky/deploy/images/fvp-base``
+directory.
 
-                git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
-                cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps
+Note that the BSP includes the Poky Linux distribution, which offers BusyBox-like utilities.
 
-        Follow the menu options to sync Busybox for FVP
+Provided components
+-------------------
 
-        NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
-
-        OR
-
-        Method 2:
-
-        ::
-
-                # Move to the platform directory
-                mkdir platform
-                cd platform
-
-                # Fetch software stack
-                repo init -u https://git.linaro.org/landing-teams/working/arm/manifest.git -m pinned-latest.xml -b 19.10
-                repo sync
-
-                # Get GCC tools
-                mkdir -p tools/gcc
-                cd tools/gcc
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/aarch64-linux-gnu/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/arm-linux-gnueabihf/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-
-        # Optional: Enable /etc/network in busybox
-        Enable FEATURE_ETC_NETWORKS in busybox/libbb/Config.src
-
-        # Build
-
-        ::
-
-                ./build-scripts/build-all.sh -p fvp -f busybox all
-
-        # Run
-
-        ::
-
-                export INITRD=output/fvp/fvp-busybox/uboot/ramdisk.img
-                export IMAGE=output/fvp/fvp-busybox/uboot/Image
-                export BL1=output/fvp/fvp-busybox/uboot/bl1.bin
-                export FIP=output/fvp/fvp-busybox/uboot/fip.bin
-                export DTB=output/fvp/fvp-busybox/uboot/fvp-base-aemv8a-aemv8a-t1.dtb
-
-                cd model-scripts/fvp
-                ./run_model.sh
-
-Sync, Build and Run OE on Armv8-A Base Platform FVP
----------------------------------------------------
-This description outlines steps to boot latest stable kernel version 5.3 on Armv8-A Base Platform FVP with OE (LAMP) filesystem.
+Within the Yocto project, each component included in the FVP-BASE software stack is specified as
+a `Bitbake recipe <https://www.yoctoproject.org/docs/1.6/bitbake-user-manual/bitbake-user-manual.html#recipes>`__.
+The FVP-BASE recipes are located at ``<workspace>/layers/meta-arm/``.
 
 
-        Software sync can be done in two methods:
+Software Components
+###################
 
-        Method 1:
+Trusted Firmware-A
+******************
 
-        ::
+Based on `Trusted Firmware-A <https://trustedfirmware-a.readthedocs.io/en/latest/>`__
 
-                git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
-                cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps
++--------+----------------------------------------------------------------------------------------------------+
+| Recipe | <workspace>/layers/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a-fvp.inc |
++--------+----------------------------------------------------------------------------------------------------+
+| Files  | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/bl1-fvp.bin                               |
+|        | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/fip-fvp.bin                               |
++--------+----------------------------------------------------------------------------------------------------+
 
-        Follow the menu options to sync OE for FVP
+U-Boot
+******
 
-        NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
+Based on `U-Boot gitlab <https://gitlab.denx.de/u-boot/u-boot>`__
 
-        OR
++--------+-------------------------------------------------------------------------------+
+| Recipe | <workspace>/layers/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend |
++--------+-------------------------------------------------------------------------------+
+| Files  | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/u-boot.bin           |
++--------+-------------------------------------------------------------------------------+
 
-        Method 2:
 
-        ::
+Linux
+*****
 
-                # Move to the platform directory
-                mkdir platform
-                cd platform
+The recipe responsible for building a 5.4 version of the Yocto Linux kernel
 
-                # Fetch software stack
-                repo init -u https://git.linaro.org/landing-teams/working/arm/manifest.git -m pinned-latest.xml -b 19.10
-                repo sync
++--------+-----------------------------------------------------------------------------------+
+| Recipe | <workspace>/layers/openembedded-core/meta/recipes-kernel/linux/linux-yocto_5.4.bb |
++--------+-----------------------------------------------------------------------------------+
+| Files  | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/Image                    |
++--------+-----------------------------------------------------------------------------------+
 
-                # Get GCC tools
-                mkdir -p tools/gcc
-                cd tools/gcc
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/aarch64-linux-gnu/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/arm-linux-gnueabihf/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
 
-                # Build
-                ./build-scripts/build-all.sh -p fvp -f oe all
+Poky Linux distro
+*****************
 
-                # Fetch prebuilt OE filesystem
-                mkdir oedisk
-                cd oedisk
-                wget http://releases.linaro.org/openembedded/juno-lsk/15.09/lt-vexpress64-openembedded_lamp-armv8-gcc-4.9_20150912-729.img.gz
-                gunzip lt-vexpress64-openembedded_lamp-armv8-gcc-4.9_20150912-729.img.gz
-                export DISK=lt-vexpress64-openembedded_lamp-armv8-gcc-4.9_20150912-729.img
+The layer is based on the `poky <https://www.yoctoproject.org/software-item/poky/>`__ Linux distribution.
+The provided distribution is based on BusyBox and built using glibc.
 
-                # Run
-                export INITRD=output/fvp/fvp-oe/uboot/ramdisk.img
-                export IMAGE=output/fvp/fvp-oe/uboot/Image
-                export BL1=output/fvp/fvp-oe/uboot/bl1.bin
-                export FIP=output/fvp/fvp-oe/uboot/fip.bin
-                export DTB=output/fvp/fvp-oe/uboot/fvp-base-aemv8a-aemv8a-t1.dtb
++--------+-----------------------------------------------------------------------------------------------+
+| Recipe | <workspace>/layers/openembedded-core/meta/recipes-core/images/core-image-minimal.bb           |
++--------+-----------------------------------------------------------------------------------------------+
+| Files  | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/core-image-minimal-fvp-base.disk.img |
++--------+-----------------------------------------------------------------------------------------------+
 
-                cd model-scripts/fvp
-                ./run_model.sh
 
-Sync, Build and Run Android-N on Armv8-A Base Platform FVP
-----------------------------------------------------------
-This description outlines steps to boot Android N (7.0-16.10) filesystem on Armv8-A Base Platform FVP.
+Running the software on FVP
+---------------------------
 
-        Software sync can be done in two methods:
+The run-scripts structure is as follows:
 
-        Method 1:
+::
 
-        ::
+    run-scripts
+    |--fvp
+       |--run_model.sh
+       |-- ...
 
-                git clone https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git
-                cd arm-reference-platforms/
-                python3 sync_workspace.py  --no_check_apt_deps
+Ensure that all dependencies are met by executing the FVP: $MODEL`. You should see
+the FVP launch, presenting a graphical interface showing information about the current state of the FVP.
 
-        Follow the menu options to sync Android for FVP
+The ``run_model.sh`` script in ``<workspace>/run-scripts/fvp`` will launch the FVP.
+Set environment variables and execute the ``run_model.sh`` as follows:
 
-        NOTE: Choose 'Prebuilts' in menu option to download prebuilt binaries
+::
 
-        OR
+    export IMAGE=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base/Image
+    export BL1=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base/bl1-fvp.bin
+    export FIP=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base/fip-fvp.bin
+    export DISK=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base/core-image-minimal-fvp-base.disk.img
+    export DTB=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base/fvp-base-gicv3-psci-custom.dtb
 
-        Method 2:
-
-        ::
-
-                # Move to the platform directory
-                mkdir platform
-                cd platform
-
-                # Fetch software stack
-                repo init -u https://git.linaro.org/landing-teams/working/arm/manifest.git -m pinned-ack.xml -b 19.10
-                repo sync
-
-                # Get GCC tools
-                mkdir -p tools/gcc
-                cd tools/gcc
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/aarch64-linux-gnu/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/arm-linux-gnueabihf/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-
-                # Fetch prebuilt Android N filesystem
-                mkdir -p prebuilts/android/fvp
-                cd prebuilts/android/fvp
-                wget http://releases.linaro.org/android/reference-lcr/fvp/7.0-16.10/fvp.img.bz2
-                bunzip2 fvp.img.bz2
-                export DISK=fvp.img
-                wget http://releases.linaro.org/android/reference-lcr/fvp/7.0-16.10/ramdisk.img
-
-        # Build
-        ::
-
-                ./build-scripts/build-all.sh -p fvp -f android all
-
-        # Run
-        ::
-
-                export INITRD=prebuilts/android/fvp/ramdisk.img
-                export IMAGE=output/fvp/fvp-android/uboot/Image
-                export BL1=output/fvp/fvp-android/uboot/bl1.bin
-                export FIP=output/fvp/fvp-android/uboot/fip.bin
-                export DTB=output/fvp/fvp-android/uboot/fvp-base-aemv8a-aemv8a-t1.dtb
-
-                cd model-scripts/fvp
-                ./run_model.sh
+    cd <workspace>/run-scripts/fvp
+    ./run_model.sh
 
 Enable network on FVP
 ---------------------
@@ -275,45 +183,59 @@ Enable network on FVP
 To enable network on FVP, follow below steps
 
 1. Create network bridge and add the host PC network as its interface:
-        ::
+::
 
-                sudo apt-get install bridge-utils
-                sudo brctl addbr br0
-                sudo brctl addif br0 <host network interface name>
-                sudo ifconfig <host network interface name> 0.0.0.0
-                sudo ifconfig br0 up
-                sudo dhclient br0
+    sudo apt-get install bridge-utils
+    sudo brctl addbr br0
+    sudo brctl addif br0 <host network interface name>
+    sudo ifconfig <host network interface name> 0.0.0.0
+    sudo ifconfig br0 up
+    sudo dhclient br0
 
 2. Add the tap interface:
-        ::
+::
 
-                sudo ip tuntap add dev <bridge_interface_name> mode tap user $(whoami)
-                sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
-                sudo brctl addif br0 <bridge_interface_name>
+    sudo ip tuntap add dev <bridge_interface_name> mode tap user $(whoami)
+    sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
+    sudo brctl addif br0 <bridge_interface_name>
 
 3. Add below parameters in run_model.sh:
-        ::
+::
 
-                -C bp.hostbridge.interfaceName=<bridge_interface_name>
-                -C bp.smsc_91c111.enabled=1
+    -C bp.hostbridge.interfaceName=<bridge_interface_name>
+    -C bp.smsc_91c111.enabled=1
 
 4. ./run_model.sh
-
 
 Build and Run AArch32 builds on Armv8-A Base Platform FVP
 ---------------------------------------------------------
 
-Build: Use platform selection as fvp32 in build steps explained above.
-       Note: Output files become available at output/fvp32 folder. Set environment variables like IMAGE accordingly.
+Build: Follow the steps explained above, however set the MACHINE variable as follows:
 
-Run: Pass aarch32 argument to run_mode.sh
-        ::
+::
 
-              ./run_model.sh --aarch32
+    export MACHINE="fvp-base-arm32"
 
-Note: Android boot is not supported on AArch32 builds
+Note: Output files become available in the <workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32 folder.
+Set environment variables accordingly:
+
+::
+
+    export IMAGE=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32/zImage
+    export BL1=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32/bl1-fvp.bin
+    export FIP=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32/fip-fvp.bin
+    export DISK=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32/core-image-minimal-fvp-base-arm32.disk.img
+    export DTB=<workspace>/build-poky/tmp-poky/deploy/images/fvp-base-arm32/fvp-base-gicv3-psci-custom.dtb
+
+
+Run: Pass aarch32 argument to run_model.sh
+
+::
+
+    ./run_model.sh --aarch32
+
 
 --------------
 
-*Copyright (c) 2019-2020, Arm Limited. All rights reserved.*
+*Copyright (c) 2020, Arm Limited. All rights reserved.*
 

@@ -4,6 +4,19 @@ Change Log & Release Notes
 This document contains a summary of the new features, changes, fixes and known
 issues in each release of platform software support for Armv8-A Base Platform FVP.
 
+Version 20.06 (2020-Q2 release)
+-------------------------------
+Changed
+^^^^^^^
+- Update to latest LTS kernel version 5.4
+- Update to Trusted Firmware-A version 2.2
+- Update to U-Boot version 2020.01
+
+Features
+^^^^^^^^^
+- Yocto based Poky distro supported with latest LTS kernel version 5.4
+
+
 Version 19.10 (2019-Q4 release)
 -------------------------------
 
