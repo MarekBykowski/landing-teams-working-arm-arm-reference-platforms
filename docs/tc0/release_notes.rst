@@ -1,4 +1,4 @@
-Release notes - 2020.07.20
+Release notes - 2020.08.14
 ==========================
 
 .. section-numbering::
@@ -8,7 +8,7 @@ Release notes - 2020.07.20
 
 Release tag
 -----------
-The manifest release tag for this release is TC0-2020.07.20
+The manifest tag for this release is TC0-2020.08.14
 
 Components
 ----------
@@ -20,7 +20,7 @@ The following is a summary of the key software features of the release:
 
 Hardware Features
 -----------------
- - Booker CI with MTU support driver in SCP.
+ - Booker CI with Memory Tagging Unit(MTU) support driver in SCP.
  - GIC Clayton Initialization in Trusted Firmware-A.
  - HDLCD and virtual encoder support for display in Linux.
  - MHUv2 Driver for SCP and AP communication.

@@ -78,9 +78,9 @@ Board Support Package
 ::
 
     cd <tc0_workspace>/bsp/
-    export TC0_RELEASE=refs/tag/TC0-2020.07.20
+    export TC0_RELEASE=refs/tags/TC0-2020.08.14
     repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0-yocto.xml -b ${TC0_RELEASE}
-    repo sync -j${NUM_CPUS}
+    repo sync -j$(nproc)
     export DISTRO="poky"
     export MACHINE="tc0"
     source setup-environment
@@ -106,12 +106,12 @@ Two profiles are supported:
 ::
 
     cd <tc0_workspace>/android10/
-    export TC0_RELEASE=refs/tag/TC0-2020.07.20
+    export TC0_RELEASE=refs/tags/TC0-2020.08.14
     repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0-android.xml -b ${TC0_RELEASE}
-    repo sync -j${NUM_CPUS}
+    repo sync -j$(nproc)
     . build/envsetup.sh
-    lunch tc0_swr-eng      # or lunch tc0_nano-eng
-    make -j${NUM_CPUS}
+    lunch tc0_swr-eng  # or lunch tc0_nano-eng
+    make -j$(nproc)
 
 
 Provided components
@@ -133,8 +133,8 @@ Based on `Trusted Firmware-A <https://trustedfirmware-a.readthedocs.io/en/latest
 +--------+------------------------------------------------------------------------------------------------------------+
 | Recipe | <tc0_workspace>/bsp/layers/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a-tc0.inc |
 +--------+------------------------------------------------------------------------------------------------------------+
-| Files  | * bl1-tc0.bin                                                                                              |
-|        | * fip-tc0.bin                                                                                              |
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/bl1-tc0.bin                                    |
+|        | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/fip-tc0.bin                                    |
 +--------+------------------------------------------------------------------------------------------------------------+
 
 
@@ -146,8 +146,8 @@ Based on `SCP Firmware <https://github.com/ARM-software/SCP-firmware>`__
 +--------+------------------------------------------------------------------------------------------------+
 | Recipe | <tc0_workspace>/bsp/layers/meta-arm/meta-arm-bsp/recipes-bsp/scp-firmware/scp-firmware-tc0.inc |
 +--------+------------------------------------------------------------------------------------------------+
-| Files  | * scp_ramfw.bin                                                                                |
-|        | * scp_romfw.bin                                                                                |
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/scp_ramfw.bin                      |
+|        | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/scp_romfw.bin                      |
 +--------+------------------------------------------------------------------------------------------------+
 
 
@@ -159,7 +159,7 @@ Based on `U-Boot gitlab <https://gitlab.denx.de/u-boot/u-boot>`__
 +--------+------------------------------------------------------------------------------------+
 | Recipe | <tc0_workspace>/bsp/layers/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot-tc0.inc |
 +--------+------------------------------------------------------------------------------------+
-| Files  | * u-boot.bin                                                                       |
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/u-boot.bin             |
 +--------+------------------------------------------------------------------------------------+
 
 
@@ -171,7 +171,7 @@ The recipe responsible for building a 4.19 version of the Android Common kernel 
 +--------+-----------------------------------------------------------------------------------------------+
 | Recipe | <tc0_workspace>/bsp/layers/meta-arm/meta-arm-bsp/recipes-kernel/linux/linux-arm64-ack-tc0.inc |
 +--------+-----------------------------------------------------------------------------------------------+
-| Files  | * Image                                                                                       |
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/Image                             |
 +--------+-----------------------------------------------------------------------------------------------+
 
 
@@ -181,11 +181,11 @@ Poky Linux distro
 The layer is based on the `poky <https://www.yoctoproject.org/software-item/poky/>`__ Linux distribution.
 The provided distribution is based on BusyBox and built using glibc.
 
-+--------+---------------------------------------------------------------------------------------------+
-| Recipe | <tc0_workspace>/bsp/layers/openembedded-core/meta/recipes-core/images/core-image-minimal.bb |
-+--------+---------------------------------------------------------------------------------------------+
-| Files  | * core-image-minimal-tc0.cpio.gz.u-boot                                                     |
-+--------+---------------------------------------------------------------------------------------------+
++--------+---------------------------------------------------------------------------------------------------+
+| Recipe | <tc0_workspace>/bsp/layers/openembedded-core/meta/recipes-core/images/core-image-minimal.bb       |
++--------+---------------------------------------------------------------------------------------------------+
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/core-image-minimal-tc0.cpio.gz.u-boot |
++--------+---------------------------------------------------------------------------------------------------+
 
 
 Android
@@ -235,10 +235,14 @@ the previously built images as arguments. Execute the ``run_model.sh`` script:
        -t, --tap-interface              [OPTIONAL] enable TAP interface
        -e, --extra-model-params	        [OPTIONAL] extra model parameters
        If using an android distro, export ANDROID_PRODUCT_OUT variable to point to android out directory
-
+       for eg. ANDROID_PRODUCT_OUT=<tc0_workspace>/android10/out/target/product/tc0_swr
+ 
        For Running Poky/Android :
-        ./run-scripts/run_model.sh -m <model binary path> -d poky/android-swr/android-nano
-
+        ./run-scripts/run_model.sh -m <model binary path> -d poky
+        OR
+        ./run-scripts/run_model.sh -m <model binary path> -d android-swr
+        OR
+        ./run-scripts/run_model.sh -m <model binary path> -d android-nano
 
 When the script is executed, three terminal instances will be launched, one for the SCP and two for
 the  AP. Once the FVP is running, the SCP will be the first to boot, bringing the AP out of reset.
