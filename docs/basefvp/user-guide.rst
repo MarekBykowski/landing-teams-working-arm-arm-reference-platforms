@@ -234,6 +234,19 @@ Run: Pass aarch32 argument to run_model.sh
 
     ./run_model.sh --aarch32
 
+Release Tags
+------------
+
+Here's the list of release tags and corresponding Fast Model version supported:
+
++-----------------------+-------------------------+
+|     Release Tag       |     Base FVP Version    |
++=======================+=========================+
+| BASEFVP-2020.08.06    |        11.11.34         |
++-----------------------+-------------------------+
+|                       |                         |
++-----------------------+-------------------------+
+
 
 --------------
 
