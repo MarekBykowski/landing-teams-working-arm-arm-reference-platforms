@@ -1,0 +1,138 @@
+ PE_INFO: Number of PE detected       :    8 
+ GIC_INFO: Number of GICD             :    1 
+ GIC_INFO: Number of ITS              :    1 
+ TIMER_INFO: Number of system timers  :    2 
+ WATCHDOG_INFO: Number of Watchdogs   :    2 
+ PCIE_INFO: Number of ECAM regions    :    1 
+ SMMU_INFO: Number of SMMU CTRL       :    0 
+ Peripheral: Num of USB controllers   :    0 
+ Peripheral: Num of SATA controllers  :    2 
+ Peripheral: Num of UART controllers  :    1 
+   1 : Check for number of PE            : Result:  PASS 
+   2 : Check for SIMD extensions         : Result:  PASS 
+   3 : Check for 16-bit ASID support     : Result:  PASS 
+   4 : Check MMU Granule sizes           : Result:  PASS 
+   5 : Check Cache Architecture          : Result:  PASS 
+   6 : Check HW Coherence support        : Result:  PASS 
+   7 : Check Cryptographic extensions    
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 1 
+   8 : Check Little Endian support       : Result:  PASS 
+   9 : Check EL2 implementation          : Result:  PASS 
+  10 : Check AARCH64 implementation      : Result:  PASS 
+  11 : Check PMU Overflow signal         : Result:  PASS 
+  12 : Check number of PMU counters      : Result:  PASS 
+  13 : Check Synchronous Watchpoints     : Result:  PASS 
+  14 : Check number of Breakpoints       : Result:  PASS 
+  15 : Check Arch symmetry across PE     : Result:  PASS 
+  16 : Check EL3 implementation          : Result:  PASS 
+  17 : Check CRC32 instruction support   : Result:  PASS 
+  18 : Check for PMBIRQ signal           
+   ARM-TF firmware not ported, skipping this test: Result:  -SKIPPED- 2 
+  19 : Check for RAS extension           : Result:  PASS 
+  20 : Check for 16-Bit VMID             : Result:  PASS 
+  21 : Check for Virtual host extensions : Result:  PASS 
+  22 : Check for pointer signing         : Result:  -SKIPPED- 1 
+
+      *** One or more PE tests have failed... *** 
+ 101 : Check GIC version                 : Result:  PASS 
+ 102 : If PCIe, then GIC implements ITS  : Result:  PASS 
+ 103 : GIC number of Security states(2)  : Result:  PASS 
+ 104 : GIC Maintenance Interrupt         : Result:  PASS 
+
+     All GIC tests Passed!! 
+ 201 : Check Counter Frequency           : Result:  PASS 
+ 202 : Check EL0-Phy timer interrupt     : Result:  PASS 
+ 203 : Check EL0-Virtual timer interrupt : Result:  PASS 
+ 204 : Check EL2-phy timer interrupt     : Result:  PASS 
+ 205 : Check EL2-Virtual timer interrupt : Result:  PASS 
+ 206 : SYS Timer if PE Timer not ON      : Result:  PASS 
+ 207 : CNTCTLBase & CNTBaseN access      : Result:  PASS 
+ 208 : Generate Mem Mapped SYS Timer Intr: Result:  PASS 
+
+      All Timer tests passed!! 
+ 301 : Check NS Watchdog Accessibility   : Result:  PASS 
+ 302 : Check Watchdog WS0 interrupt      : Result:  PASS 
+
+      All Watchdog tests passed!! 
+ 401 : Check ECAM Presence               : Result:  PASS 
+ 402 : Check ECAM value in MCFG table    : Result:  PASS 
+ 420 : Check Type 0/1 common config rules: Result:  PASS 
+ 421 : Check Type 0 config header rules  : Result:  PASS 
+ 422 : Check Type 1 config header rules  : Result:  PASS 
+ 423 : Check PCIe capability rules       : Result:  -SKIPPED- 1 
+ 424 : Check Device capabilites reg rules: Result:  PASS 
+ 425 : Check Device Control register rule: Result:  PASS 
+ 426 : Check Device cap 2 register rules : Result:  PASS 
+ 427 : Check Device control 2 reg rules  : Result:  PASS 
+ 428 : Check Power management cap rules  : Result:  PASS 
+ 429 : Check Power management/status rule: Result:  PASS 
+ 430 : Check Cmd Reg memory space enable : Result:  PASS 
+ 431 : Check Type0/1 BIST Register rule  : Result:  PASS 
+ 432 : Check HDR CapPtr Register rule    : Result:  PASS 
+ 433 : Check Max payload size supported  : Result:  PASS 
+ 434 : Check BAR memory space & Type rule: Result:  PASS 
+ 435 : Check Function level reset rule   : Result:  PASS 
+ 436 : Check ARI forwarding support rule : Result:  -SKIPPED- 1 
+ 437 : Check OBFF supported rule         : Result:  -SKIPPED- 1 
+ 438 : Check CTRS and CTDS rule          : Result:  -SKIPPED- 1 
+ 439 : Check i-EP atomicop rule          : Result:  -SKIPPED- 1 
+ 440 : Check Rootport ATS and PRI rule   : Result:  PASS 
+ 441 : Check MSI and MSI-X support rule  : Result:  PASS 
+ 442 : Check Power Management rules      : Result:  PASS 
+ 443 : Check ARI forwarding enable rule  : Result:  PASS 
+ 444 : Check device under RP in same ECAM: Result:  PASS 
+ 445 : Check all RP in HB is in same ECAM: Result:  PASS 
+
+     One or more PCIe tests have failed.... 
+       TEST Wakeup from Power Semantic B  
+ 501 : Wake from EL0 PHY Timer Interrupt : Result:  PASS 
+ 502 : Wake from EL0 VIRT Timer Interrupt: Result:  PASS 
+ 503 : Wake from EL2 PHY Timer Interrupt : Result:  PASS 
+ 504 : Wake from Watchdog WS0 Interrupt  : Result:  PASS 
+ 505 : Wake from System Timer Interrupt  : Result:  PASS 
+ 601 : Check USB CTRL Interface via PCIe : Result:  -SKIPPED- 1 
+ 602 : Check SATA CTRL Interface via PCIe: Result:  PASS 
+ 603 : Check SBSA UART register offsets  : Result:  PASS 
+ 604 : Check GENERIC UART Interrupt      : Result:  PASS 
+ 605 : Memory Access to Un-Populated addr: Result:  PASS 
+ 701 : Check 64KB Granularity support    
+       No SMMU Controllers are discovered : Result:  -SKIPPED- 1 
+ 702 : All SMMUs have same Arch Revision 
+       No SMMU Controllers are discovered : Result:  -SKIPPED- 1 
+ 703 : SMMU Compatibility Check          
+       No SMMU Controllers are discovered : Result:  -SKIPPED- 1 
+ 704 : If PCIe, Check Stall model        
+       No SMMU Controllers are discovered : Result:  -SKIPPED- 1 
+ 705 : SMMUv2 unique intr per ctxt bank  
+       No SMMU Controllers are discovered : Result:  -SKIPPED- 3 
+ 706 : Unique stream id for each req id   : Result:  PASS 
+
+      One or more SMMU tests have failed...  
+ 801 : Enhanced ECAM Memory access check : Result:  PASS 
+ 802 : PCIe BAR access check             : Result:  PASS 
+ 803 : PCIe Address translation check    : Result:  PASS 
+ 804 : Generate MSI(X) interrupts        
+       MSI Assignment failed for bdf : 0x60007
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 1 
+ 805 : Generate PASID PCIe transactions  : Result:  PASS 
+ 806 : Generate PCIe legacy interrupts   
+    Invalid Interrupt ID number -1347440721 
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 2 
+ 807 : Check PCI Express I/O Coherency   
+       WB and OSH mem alloc failure 2
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 2 
+ 808 : Check BME functionality of RP     : Result:  PASS 
+ 809 : Check RP Sec Bus transactions are TYPE0
+       BDF 0x200 Sec Bus Transaction failure
+       BDF 0x200 Sec Bus Transaction failure
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 2 
+ 810 : Check RP Sub Bus transactions are TYPE1
+       BDF 0x200 Sub Bus Transaction failure
+       BDF 0x200 Sub Bus Transaction failure
+       Failed on PE -    0 for Level=  4 : Result:  --FAIL-- 2 
+
+     One or more Exerciser tests have failed.... 
+
+     ------------------------------------------------------- 
+     Total Tests run  =   90;  Tests Passed  =   71  Tests Failed =    6
+     --------------------------------------------------------- 
