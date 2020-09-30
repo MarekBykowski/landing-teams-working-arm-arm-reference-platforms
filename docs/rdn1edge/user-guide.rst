@@ -117,23 +117,8 @@ This section explains how to sync the software stack.
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
   Note: The RELEASE_TAG can be found in the release notes, if obtained. If
-  a release note is not available, or if a RELEASE_TAG is not known, use
-  "master" as the branch to checkout and pass it as the value to the "-b"
-  parameter as shown in the commands below.
-
-        - For RD-N1-Edge:
-
-        ::
-
-                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edge.xml -b master
-                repo sync -j $(nproc) --fetch-submodules --force-sync
-
-        - For RD-N1-Edge-Dual:
-
-        ::
-
-                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edgex2.xml -b master
-                repo sync -j $(nproc) --fetch-submodules --force-sync
+  a release note is not available, or if a RELEASE_TAG is not known, see the
+  section "Release Tags" below to obtain the most recent release tag.
 
 - For obtaining the software stack with latest *upstream updates* but which
   might not have been fully validated, use the following commands to sync:
@@ -255,12 +240,35 @@ All the supported tests for RD-N1-Edge and RD-N1-Edge-Dual are listed below:
 +----------------------------------------------+-------------+-----------------+
 | `KVM`_                                       | Supported   |                 |
 +----------------------------------------------+-------------+-----------------+
-| `RAS`_                                       | Supported   |                 |
+| `RAS`_                                       |             |                 |
 +----------------------------------------------+-------------+-----------------+
-| `Secure Boot`_                               | Supported   |                 |
+| `Secure Boot`_                               |             |                 |
 +----------------------------------------------+-------------+-----------------+
 | `TFTF`_                                      | Supported   |                 |
 +----------------------------------------------+-------------+-----------------+
+
+Release Tags
+------------
+
+Most recent release tag:
+  - RD-N1-Edge platform: RD-INFRA-2020.09.30
+  - RD-N1-Edge-Dual platform: RD-INFRA-2020.09.30
+
+Here's the list of release tags and corresponding Fast Model version supported:
+
++-----------------------+-------------------------+-----------------------------+
+| Release Tag           | RD-N1-Edge FVP Version  | RD-N1-Edge-Dual FVP Version |
++=======================+=========================+=============================+
+| RD-INFRA-2020.09.30   |        11.12.43         |          11.12.43           |
++-----------------------+-------------------------+-----------------------------+
+|                       |                         |                             |
++-----------------------+-------------------------+-----------------------------+
+|                       |                         |                             |
++-----------------------+-------------------------+-----------------------------+
+|                       |                         |                             |
++-----------------------+-------------------------+-----------------------------+
+|                       |                         |                             |
++-----------------------+-------------------------+-----------------------------+
 
 --------------
 
