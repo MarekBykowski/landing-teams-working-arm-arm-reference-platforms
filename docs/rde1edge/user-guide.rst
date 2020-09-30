@@ -102,18 +102,8 @@ This section explains how to sync the software stack.
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
   Note: The RELEASE_TAG can be found in the release notes, if obtained. If
-  a release note is not available, or if a RELEASE_TAG is not known, use
-  "master" as the branch to checkout and pass it as the value to the "-b"
-  parameter as shown in the commands below.
-
-        ::
-
-                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rde1edge.xml -b master
-                repo sync -j $(nproc) --fetch-submodules --force-sync
-
-
-  Note: If a release tag is not available, use "master" as the branch to
-  checkout and pass it as the value to the "-b" parameter.
+  a release note is not available, or if a RELEASE_TAG is not known, see the
+  section "Release Tags" below to obtain the most recent release tag.
 
 - For obtaining the software stack with latest *upstream updates* but which
   might not have been fully validated, use the following commands to sync:
@@ -207,9 +197,29 @@ supported tests are listed below:
                    d. `Ubuntu 18.4 Enterprise Linux Distribution`_
         2. Supported Tests:
                    a. `KVM`_
-                   b. `RAS`_
-                   c. `Secure Boot`_
 
+
+Release Tags
+------------
+
+Most recent release tag:
+  - RD-E1-Edge platform: RD-INFRA-2020.09.30
+
+Here's the list of release tags and corresponding Fast Model version supported:
+
++-----------------------+-------------------------+
+| Release Tag           | RD-E1-Edge FVP Version  |
++=======================+=========================+
+| RD-INFRA-2020.09.30   |        11.12.43         |
++-----------------------+-------------------------+
+|                       |                         |
++-----------------------+-------------------------+
+|                       |                         |
++-----------------------+-------------------------+
+|                       |                         |
++-----------------------+-------------------------+
+|                       |                         |
++-----------------------+-------------------------+
 
 --------------
 
