@@ -31,64 +31,14 @@ stored on the luv-live disk image which can be retrived from this disk. The
 results can then be looked into to determine the conformance to the SBSA and
 SBBR standards.
 
-Procedure to build ACS test for RD-N1-Edge platform
----------------------------------------------------
+Procedure to build for ACS test on RD-N1-Edge platform
+------------------------------------------------------
 
-The procedure to build the ACS test suite along the RD-N1-Edge platform software
-stack is listed below. The components of the RD-N1-Edge platform software stack
-that are built is limited to those that provide the EFI implementation and the
-EFI shell on the RD-N1-Edge platforms (i.e, SCP, TF-A and EDK2).
-
-To build the RD-N1-Edge software stack, ACS tests and to prepares the disk
-image, the command to be used is
-
-   ::
-
-        ./build-scripts/build-test-acs.sh -p rdn1edge <command>
-
-Supported command line options are listed below
-
-   -  <command>
-
-      -  Supported commands are
-
-         -  clean
-         -  build
-         -  package
-         -  all (all the three above)
-
-
-Examples of the build command are
-
-   -   ::
-
-        ./build-scripts/build-test-acs.sh -p rdn1edge all
-
-      - This command cleans, builds and packages the RD-N1-Edge software stack
-        required for the ACS test on RD-N1-Edge platform. The ACS test suite is
-        also built from source.
-
-   -   ::
-
-        ./build-scripts/build-test-acs.sh -p rdn1edge build
-
-      - This command performs an incremental build of the software components
-        included in the software stack for ACS test on the RD-N1-Edge platform.
-        Note: this command should be followed by the 'package' command to
-        complete the preparation of the fip and the luv-live disk image.
-
-   -   ::
-
-        ./build-scripts/build-test-acs.sh -p rdn1edge package
-
-      - This command packages the previously build software stack and prepares
-        the fip and the luv-live disk image.
-
-The above build command includes steps to build the ACS test suite from the
-source. In case it is desired to use a pre-built image of the ACS test
-luv-live disk image, the build can be restricted to the platform software
-firmware components such as SCP, TF-A and EDK2. The command to be used to
-build the firmware components but not ACS test suite from the source is
+The procedure to build the RD-N1-Edge platform software stack is listed below.
+The components of the RD-N1-Edge platform software stack that are built is
+limited to those that provide the EFI implementation and the EFI shell on the
+RD-N1-Edge platforms (i.e, SCP, TF-A and EDK2). The command to be used to
+build these firmware components is
 
    ::
 
@@ -146,13 +96,10 @@ below.
 
 Supported command line options are listed below
 
-   -  -v <absolute path to the luv-live prebuilt image> (optional)
+   -  -v <absolute path to the luv-live prebuilt image>
 
       -  Allows use of a pre-built luv-live image for the test. The absolute
-         path to the luv-live image has be supplied as the parameter. This
-         parameter is optional, and if not specified, the luv-live image is
-         picked up from the location into which the images are packaged by the
-         build command.
+         path to the luv-live image has be supplied as the parameter.
 
    -  -n [true|false] (optional)
 
@@ -171,14 +118,6 @@ Example commands to execute the ACS tests are as listed below.
 
    -   ::
 
-        ./acs.sh -p rdn1edge
-
-      - This command starts the execution of the RD-N1-Edge model and the ACS
-        tests are executed. The luv-live image is picked up from the location
-        ./output/rdn1edge/luv-live-image-gpt.img.
-
-   -   ::
-
         ./acs.sh -p rdn1edge -v /tmp/luv-live-image-gpt.img
 
       - This command starts the execution of the RD-N1-Edge model and the ACS
@@ -187,13 +126,12 @@ Example commands to execute the ACS tests are as listed below.
 
    -   ::
 
-        ./acs.sh -p rdn1edge -n true -a "-C board.flash0.diagnostics=1"
+        ./acs.sh -p rdn1edge -n true -v /tmp/luv-live-image-gpt.img -a "-C board.flash0.diagnostics=1"
 
       - This command starts the execution of the RD-N1-Edge model with
         networking enable and the ACS tests are executed. The luv-live image is
-        picked up from the location ./output/rdn1edge/luv-live-image-gpt.img.
-        Additional parameters to the model are supplied using the -a command
-        line parameter.
+        picked up from the location /tmp/luv-live-image-gpt.img. Additional
+        parameters to the model are supplied using the -a command line parameter.
 
 --------------
 
