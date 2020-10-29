@@ -42,11 +42,23 @@ To resolve these dependencies, run:
     sudo apt-get install chrpath gawk texinfo libssl-dev diffstat wget git-core unzip gcc-multilib \
      build-essential socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils \
      iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm git-lfs openssl \
-     curl libncurses-dev libz-dev python-pip repo
+     curl libncurses-dev libz-dev python-pip repo u-boot-tools
 
+If syncing and building android, the minimum requirements for the host machine can be found at https://source.android.com/setup/build/requirements, These include:
+ * At least 250GB of free disk space to check out the code and an extra 150 GB to build it. If you conduct multiple builds, you need additional space.
+ * At least 16 GB of available RAM/swap.
 
 Syncing and building the source code
 ------------------------------------
+
+There are two distros supported in the TC0 software stack: poky (a minimal distro containing busybox) and android.
+
+To sync code for poky, please follow the steps in "Syncing code" section for BSP only. To sync code for android, please follow the steps for syncing both BSP and Android.
+
+To build the required binaries for poky, please follow the steps in "Board Support Package build" section only. To build the binaries for Android, please follow the steps in both "Board Support Package build" and "Android OS build" sections.
+
+Syncing code
+#####################
 
 Create a new folder that will be your workspace, which will henceforth be referred to as ``<tc0_workspace>``
 in these instructions.
@@ -55,36 +67,33 @@ in these instructions.
 
     mkdir <tc0_workspace>
     cd <tc0_workspace>
+    export TC0_RELEASE=refs/tags/TC0-2020.10.29
 
-
-All users will need to sync the Board Support Package sources. Create a ``bsp/`` directory in your
-``<tc0_workspace>``:
-
-::
-
-    mkdir bsp
-
-Users wishing to run Android will additionally need to sync the Android userspace sources. Create an
-``android10/`` directory in your ``<tc0_workspace>``:
+To sync BSP only without Android, execute the repo command.
 
 ::
 
-    mkdir android10
-
-
-Board Support Package
-#####################
-
-::
-
-    cd <tc0_workspace>/bsp/
-    export TC0_RELEASE=refs/tags/TC0-2020.08.14
-    repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0-yocto.xml -b ${TC0_RELEASE}
+    repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0.xml -b ${TC0_RELEASE} -g bsp
     repo sync -j$(nproc)
+
+To sync both the BSP and Android, execute the repo command.
+
+::
+
+    repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0.xml -b ${TC0_RELEASE} -g android
+    repo sync -j$(nproc)
+
+
+Board Support Package build
+############################
+
+::
+
+    cd <tc0_workspace>/bsp
     export DISTRO="poky"
     export MACHINE="tc0"
     source setup-environment
-    bitbake core-image-minimal
+    bitbake tc0-kernel-image
 
 The initial clean build will be lengthy, given that all host utilities are to be built as well as
 the target images. This includes host executables (python, cmake, etc.) and the required toolchain(s).
@@ -95,24 +104,45 @@ directory.
 Note that the BSP includes the Poky Linux distribution, which offers BusyBox-like utilities.
 
 
-Android userspace
+Android OS build
 #################
 
 Two profiles are supported:
 
-#. tc0_swr-eng  : This supports Android display with swiftshader (software rendering).
-#. tc0_nano-eng : This supports headless Android and provides a good runtime environment for testing shell-based applications.
+#. tc0_swr  : This supports Android display with swiftshader (software rendering).
+#. tc0_nano : This supports headless Android and provides a good runtime environment for testing shell-based applications.
+
+The android images can be built with or without authentication enabled using Android Verified Boot(AVB).
+AVB build is done in userdebug mode and takes a longer time to boot as the images are verified.
+To enable AVB, copy the kernel Image to the device profile in advance of executing the below commands to build android:
 
 ::
 
-    cd <tc0_workspace>/android10/
-    export TC0_RELEASE=refs/tags/TC0-2020.08.14
-    repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m tc0-android.xml -b ${TC0_RELEASE}
-    repo sync -j$(nproc)
-    . build/envsetup.sh
-    lunch tc0_swr-eng  # or lunch tc0_nano-eng
-    make -j$(nproc)
+    cp <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/Image <tc0_workspace>/android/device/arm/tc0/
 
+The ``build-scripts/tc0/build_android.sh`` script in ``<tc0_workspace>/android`` will patch and build android. This can be passed 2 parameters, ``-d`` for deciding which profile to build and ``-a`` for enabling AVB. The following command shows the help menu for the script:
+
+::
+
+    cd <tc0_workspace>/android
+    ./build-scripts/tc0/build_android.sh  -h
+    Incorrect script use, call script as:
+    <path to build_android.sh> [OPTIONS]
+    OPTIONS:
+    -d, --distro                            distro version, values supported [android-nano, android-swr]
+    -a, --avb                               [OPTIONAL] avb boot, values supported [true, false], DEFAULT: false
+
+As an example, to build android with software rendering and AVB enabled, execute the command:
+
+::
+
+  ./build-scripts/tc0/build_android.sh -d android-swr -a true
+
+To build headless android without AVB, execute the command:
+
+::
+
+  ./build-scripts/tc0/build_android.sh -d android-nano
 
 Provided components
 -------------------
@@ -184,7 +214,7 @@ The provided distribution is based on BusyBox and built using glibc.
 +--------+---------------------------------------------------------------------------------------------------+
 | Recipe | <tc0_workspace>/bsp/layers/openembedded-core/meta/recipes-core/images/core-image-minimal.bb       |
 +--------+---------------------------------------------------------------------------------------------------+
-| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/core-image-minimal-tc0.cpio.gz.u-boot |
+| Files  | * <tc0_workspace>/bsp/build-poky/tmp-poky/deploy/images/tc0/fitImage-core-image-minimal-tc0-tc0   |
 +--------+---------------------------------------------------------------------------------------------------+
 
 
@@ -192,8 +222,7 @@ Android
 *******
 
 Android 10 is supported in this release with device profiles suitable for TC0 machine configuration.
-Android is built as a separate project and then booted with the BSP built by Yocto. The images are
-packaged using scripts in the ``<tc0_workspace>/bsp/run-scripts`` directory.
+Android is built as a separate project and then booted with the BSP built by Yocto.
 
 
 Run scripts
@@ -231,18 +260,24 @@ the previously built images as arguments. Execute the ``run_model.sh`` script:
        OPTIONS:
        -m, --model                      path to model
        -d, --distro                     distro version, values supported [poky, android-nano, android-swr]
-       -g, --generate-android-image     [OPTIONAL] generate android image and ramdisk, values supported [true, false], DEFAULT: true
+       -a, --avb                        [OPTIONAL] avb boot, values supported [true, false], DEFAULT: false
        -t, --tap-interface              [OPTIONAL] enable TAP interface
        -e, --extra-model-params	        [OPTIONAL] extra model parameters
        If using an android distro, export ANDROID_PRODUCT_OUT variable to point to android out directory
-       for eg. ANDROID_PRODUCT_OUT=<tc0_workspace>/android10/out/target/product/tc0_swr
- 
-       For Running Poky/Android :
+       for eg. ANDROID_PRODUCT_OUT=<tc0_workspace>/android/out/target/product/tc0_swr
+
+       For running Poky:
         ./run-scripts/run_model.sh -m <model binary path> -d poky
-        OR
+
+       For running android with AVB disabled:
         ./run-scripts/run_model.sh -m <model binary path> -d android-swr
         OR
         ./run-scripts/run_model.sh -m <model binary path> -d android-nano
+
+       For running android with AVB enabled:
+        ./run-scripts/run_model.sh -m <model binary path> -d android-swr -a true
+        OR
+        ./run-scripts/run_model.sh -m <model binary path> -d android-nano -a true
 
 When the script is executed, three terminal instances will be launched, one for the SCP and two for
 the  AP. Once the FVP is running, the SCP will be the first to boot, bringing the AP out of reset.
