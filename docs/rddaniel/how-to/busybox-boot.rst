@@ -24,8 +24,8 @@ are built - *TF-A*, *UEFI*, *Linux*, *GRUB*, *SCP*.
 This document describes how to build and execute the boot test on the
 *RD-Daniel* and *RD-Daniel-XLR* fastmodel.
 
-Procedure to build Busybox boot test for RD-Daniel and RD-Daniel platform
--------------------------------------------------------------------------
+Procedure to build Busybox boot test for RD-Daniel and RD-Daniel-XLR platform
+-----------------------------------------------------------------------------
 
 This section describes how to build the disk image for busybox boot test. The
 disk image consists of an EFI partition which has grub and an ext3 partition
