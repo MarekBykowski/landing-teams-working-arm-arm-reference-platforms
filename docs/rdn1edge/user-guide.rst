@@ -102,19 +102,13 @@ This section explains how to sync the software stack.
 - For obtaining the latest *stable* software stack, use the following commands
   to sync:
 
-        - For RD-N1-Edge:
+        - For RD-N1-Edge or RD-N1-Edge dual-chip
 
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edge.xml -b refs/tags/<RELEASE_TAG>
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
-        - For RD-N1-Edge-Dual:
-
-        ::
-
-                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m pinned-rdn1edgex2.xml -b refs/tags/<RELEASE_TAG>
-                repo sync -j $(nproc) --fetch-submodules --force-sync
 
   Note: The RELEASE_TAG can be found in the release notes, if obtained. If
   a release note is not available, or if a RELEASE_TAG is not known, see the
@@ -123,18 +117,11 @@ This section explains how to sync the software stack.
 - For obtaining the software stack with latest *upstream updates* but which
   might not have been fully validated, use the following commands to sync:
 
-        - For RD-N1-Edge:
+        - For RD-N1-Edge or RD-N1-Edge dual-chip
 
         ::
 
                 repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rdn1edge.xml -b master
-                repo sync -j $(nproc) --fetch-submodules --force-sync
-
-        - For RD-N1-Edge-Dual:
-
-        ::
-
-                repo init -u https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms-manifest.git -m rdn1edgex2.xml -b master
                 repo sync -j $(nproc) --fetch-submodules --force-sync
 
 This will download the RD-N1-Edge or RD-N1-Edge-Dual software stack into the
