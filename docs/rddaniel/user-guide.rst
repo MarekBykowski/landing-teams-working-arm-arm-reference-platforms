@@ -122,9 +122,9 @@ This section explains how to sync the software stack.
 
 
   Note: The RELEASE_TAG can be found in the `Release Tags`_ section or from the
-  release notes, if obtained. If a release note is not available, or if a
-  RELEASE_TAG is not known, use "master" as the branch to checkout and pass it
-  as the value to the "-b" parameter as shown in the commands below.
+  release notes, if obtained. To obtain the most recent software stack (but
+  not fully validated), use "master" as the branch to checkout and pass it as
+  the value to the "-b"   parameter as shown in the commands below.
 
         ::
 
@@ -166,12 +166,11 @@ to download and untar the binaries:
                 cd tools/gcc
 
                 # Download and extract the binaries
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/aarch64-linux-gnu/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu.tar.xz
-                wget https://releases.linaro.org/components/toolchain/binaries/6.2-2016.11/arm-linux-gnueabihf/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-                tar -xJf gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf.tar.xz
-                wget https://armkeil.blob.core.windows.net/developer//sitecore/shell/-/media/Files/downloads/gnu-rm/5_4-2016q3/gcc-arm-none-eabi-5_4-2016q3-20160926-linux,-d-,tar.bz2
-                tar -xjf gcc-arm-none-eabi-5_4-2016q3-20160926-linux,-d-,tar.bz2
+                wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-arm-eabi.tar.xz
+                wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
+
+                tar -xJf gcc-arm-8.3-2019.03-x86_64-arm-eabi.tar.xz
+                tar -xJf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
 
 This completes the setup of the GCC toolchain binaries.
 
@@ -202,7 +201,11 @@ This completes the steps to obtain the RD-Daniel and RD-Daniel-XLR Fast Model.
 Supported Features
 ------------------
 
-RD-Daniel and RD-Daniel-XLR software stack supports busybox boot (`Busybox`_).
+RD-Daniel and RD-Daniel-XLR software stack supports the following features.
+
+- busybox boot (`Busybox`_).
+- distro boot (`Distro`_).
+- winpe boot (`WinPE`_).
 
 
 Release Tags
@@ -213,9 +216,9 @@ Here's the list of release tags and corresponding Fast Model version supported:
 +-----------------------+-------------------------+----------------------------+
 | Release Tag           | RD-Daniel FVP Version   | RD-Daniel-XLR FVP Version  |
 +=======================+=========================+============================+
-| RD-INFRA-2020.04.16   |        11.10.36         |          11.10.36          |
+| RD-INFRA-2020.11.09   |        11.12.58         |          11.12.58          |
 +-----------------------+-------------------------+----------------------------+
-|                       |                         |                            |
+| RD-INFRA-2020.04.16   |        11.10.36         |          11.10.36          |
 +-----------------------+-------------------------+----------------------------+
 |                       |                         |                            |
 +-----------------------+-------------------------+----------------------------+
@@ -230,4 +233,5 @@ Here's the list of release tags and corresponding Fast Model version supported:
 
 
 .. _Busybox: how-to/busybox-boot.rst
-
+.. _Distro: how-to/distro-test.rst
+.. _WinPE: how-to/winpe-test.rst
