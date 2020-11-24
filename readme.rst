@@ -74,6 +74,7 @@ The following platforms are supported:
 - `TC2 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/227/tc2>`__
 - `Corstone-700 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/444/corstone-700>`__
 - `Cortex A5 DesignStart <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/447/cortex-a5-designstart>`__
+- `Corstone-500 <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/615/corstone-500>`__
 - `Total Compute(TC0) <https://community.arm.com/developer/tools-software/oss-platforms/w/docs/total-compute>`__
 
 The following platforms are also supported, but currently require users to

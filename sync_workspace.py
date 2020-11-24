@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
- " Copyright (c) 2019, Arm Limited. All rights reserved.
+ " Copyright (c) 2019-2020, Arm Limited. All rights reserved.
  " Author: Ash Wilding <ash.wilding@arm.com>
  "
  " SPDX-License-Identifier: BSD-3-Clause
@@ -604,6 +604,32 @@ ARMPLATDB = {
           "fw.platsw", # Hide it from final configuration summary
         ],
       },
+
+      ### Corstone-500
+      "500": {
+        "name": "Corstone-500",
+        "pdir": "corstone500",
+        "mrel": "???",
+        "tagkey": "CORSTONE-500",
+        "knowntag": "{tagkey}-2020.11.27",
+        "build": "yocto",
+        "docs": "docs/{pdir}",
+        "platsw": {
+          "manifest": "{pdir}.xml",
+        },
+        "k": "null",
+        "fs": "null",
+        "fw": [
+          "fw.platsw",
+        ],
+        "pb": "null",
+        "includes": [
+          "oc.tfa", "oc.uboot", "oc.pokytiny",
+        ],
+        "excludes": [
+          "fw.platsw", # Hide it from final configuration summary
+        ],
+      },
     },
 
     ### DesignStart
@@ -642,7 +668,7 @@ ARMPLATDB = {
     "all": [
       "p.board.juno.64b", "p.board.juno.legacy", "p.board.tc2",
       "p.fvp.v8a.base.64b", "p.fvp.v8a.base.legacy", "p.fvp.v8a.fndn.64b",
-      "p.fvp.sg.m.775", "p.board.n1sdp", "p.corstone.700", "p.ds.a5",
+      "p.fvp.sg.m.775", "p.board.n1sdp", "p.corstone.700", "p.ds.a5", "p.corstone.500",
     ],
   },
 
@@ -1071,6 +1097,12 @@ ARMPLATDB = {
       "name": "Tiny Linux distribution (based on Poky-Tiny)",
       "priority": 60,
     },
+
+     ### Poky-Tiny Linux
+     "pokytiny": {
+       "name": "Poky-Tiny Linux distribution",
+       "priority": 60,
+     },
 
     ### CMSIS
     "cmsis": {

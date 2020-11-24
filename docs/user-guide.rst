@@ -62,6 +62,7 @@ The following platforms support different build systems
 
 * Corstone-700 : `Corstone-700 User guide <corstone-700/user-guide.rst>`__
 * Cortex A5 DesignStart : `Cortex A5 DesignStart User guide <ca5ds/user-guide.rst>`__
+* Corstone-500 : `Corstone-500 User guide <corstone-500/user-guide.rst>`__
 * Total Compute(TC0) : `Total Compute User guide <tc0/user-guide.rst>`__
 
 For Other platforms:
@@ -90,6 +91,7 @@ The following platform user guides are maintained in this git repository:
 - `Neoverse(TM) N1 SDP <n1sdp/run-on-n1sdp.rst>`__
 - `Corstone-700 <corstone-700/user-guide.rst>`__
 - `Cortex A5 DesignStart User guide <ca5ds/user-guide.rst>`__
+- `Corstone-500 User guide <corstone-500/user-guide.rst>`__
 - `Juno Development Board User guide <juno/user-guide.rst>`__
 - `Armv8-A Base Platform FVP User guide <basefvp/user-guide.rst>`__
 - `System Guidance for Mobile, SGM-775 FVP User guide <sgm775/user-guide.rst>`__
