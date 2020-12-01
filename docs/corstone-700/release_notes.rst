@@ -1,10 +1,41 @@
-Release notes - 2020.02.10
-==========================
-
 .. section-numbering::
     :suffix: .
 
 .. contents::
+
+
+Release notes - 2020.12.10
+==========================
+
+Software Features
+------------------
+The following is a summary of the key software features of this release:
+
+- Linux kernel version upgraded to 5.6
+- Enabled Ethernet support in linux.
+  (note: SMSC 91c111 in FVP and SMSC 9115 in FPGA)
+- Enabled USB host, gadget and mass support in linux (Only for FPGA)
+- Added U-boot support v2020.04
+- Trusted Firmware A upgraded to v2.3
+- Added support to configure the firewall monitor extension feature
+- Using Yocto meta-arm layers aligned with Yocto Gatesgarth.
+- Using Yocto poky-tiny-distro
+- Detailed change log can be found in change-log.rst
+
+Platform Support
+----------------
+ - This Software release is tested on Corstone700 Fast Model platform (FVP) and FPGA
+ - Supported Fast model version for this release is 11.10.47
+ - Supported FPGA version is AN543 V3.0 on MPS3 board
+
+Known Issues or Limitations
+---------------------------
+
+ - No support for multiple transport protocols in MHUv2 driver.
+   It supports single word in-channel message.
+
+Release notes - 2020.02.10
+==========================
 
 
 Components
