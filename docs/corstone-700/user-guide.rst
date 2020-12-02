@@ -43,8 +43,11 @@ Provided components
 -------------------
 Within the Yocto project, each component included in the Corstone-700 software stack is specified as
 a `bitbake recipe <https://www.yoctoproject.org/docs/1.6/bitbake-user-manual/bitbake-user-manual.html#recipes>`__.
-The recipes specific to the Corstone-700 project may be located at:
-``<corstone700_workspace>/layers/meta-corstone700``.
+The recipes specific to the Corstone-700 BSP is located at:
+``<corstone700_workspace>/meta-arm/meta-arm-bsp/``.
+The Yocto machine conf files for the Corstone-700 is:
+``<corstone700_workspace>/meta-arm/meta-arm-bsp/conf/machine/include/corstone700.inc``.
+
 
 Software for Host
 #################
@@ -54,9 +57,9 @@ Trusted Firmware-A
 Based on `ARM Trusted Firmware-A <https://github.com/ARM-software/arm-trusted-firmware>`__
 
 +--------+--------------------------------------------------------------------------------------------------+
-| Recipe | <corstone700_workspace>/layers/meta-arm/arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a.bb |
+| Recipe | <corstone700_workspace>/layers/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a              |
 +--------+--------------------------------------------------------------------------------------------------+
-| Files  | * corstone700.fip                                                                                |
+| Files  | * fip.bin                                                                                        |
 +--------+--------------------------------------------------------------------------------------------------+
 
 Linux
@@ -68,17 +71,17 @@ which is a Linux distribution stripped down to a minimal configuration.
 The provided distribution is based on busybox and built using muslibc.
 
 +--------+-------------------------------------------------------------------------------+
-| Recipe | <corstone700_workspace>/layers/meta-arm/arm/recipes-kernel/linux/linux-arm.bb |
+| Recipe | <corstone700_workspace>/layers/meta-arm/meta-arm-bsp/recipes-kernel/linux/    |
 +--------+-------------------------------------------------------------------------------+
 | Files  | * xipImage                                                                    |
-|        | * iota-tiny-image-corstone700.cramfs-xip (xip rootfs)                         |
+|        | * arm-reference-image-corstone700-[fvp/mps3].cramfs-xip (xip rootfs)          |
 +--------+-------------------------------------------------------------------------------+
 
 
 Test App
 ********
 +--------+--------------------------------------------------------------------------------------------+
-| Recipe | <corstone700_workspace>/layers/meta-arm/meta-corstone700/recipes-test/test-app/test-app.bb |
+| Recipe | <corstone700_workspace>/layers/meta-arm/meta-arm-bsp/recipes-test/corstone700-test-app/    |
 +--------+--------------------------------------------------------------------------------------------+
 | Files  | * test-app (Contained within rootfs)                                                       |
 +--------+--------------------------------------------------------------------------------------------+
@@ -93,7 +96,7 @@ The boot firmware has ROM firmware and a RAM firmware which is based on
 Internally, the OpenAMP framework has been implemented, using the MHU driver as a mailbox service.
 
 +--------+-----------------------------------------------------------------------------------------------------+
-| Recipe | <corstone700_workspace>/layers/meta-arm/meta-corstone700/recipes-bsp/boot-firmware/boot-firmware.bb |
+| Recipe | <corstone700_workspace>/layers/meta-arm/meta-arm-bsp/recipes-bsp/boot-firmware/                     |
 +--------+-----------------------------------------------------------------------------------------------------+
 | Files  | * se_ramfw.bin                                                                                      |
 |        | * se_romfw.bin                                                                                      |
@@ -103,7 +106,7 @@ Software for External System
 ############################
 
 +--------+---------------------------------------------------------------------------------------------------------+
-| Recipe | <corstone700_workspace>/layers/meta-arm/meta-corstone700/recipes-bsp/external-system/external-system.bb |
+| Recipe | <corstone700_workspace>/layers/meta-arm/meta-arm-bsp/recipes-bsp/external-system                        |
 +--------+---------------------------------------------------------------------------------------------------------+
 | Files  | * es_flashfw.bin                                                                                        |
 +--------+---------------------------------------------------------------------------------------------------------+
@@ -111,7 +114,7 @@ Software for External System
 Run scripts
 ###########
 
-Within ``<corstone700_workspace>/run-scripts/`` several convenience functions for testing the software
+Within ``<corstone700_workspace>/run-scripts/iot/`` several convenience functions for testing the software
 stack may be found.
 Usage descriptions for the various scripts are provided in the following sections.
 
@@ -123,27 +126,27 @@ In the top directory of the synced workspace (~/corstone700), run:
 
 ::
 
-    export DISTRO="iota-tiny"
-    export MACHINE="corstone700"
     source setup-environment
+    --> select corstone700-fvp or corstone700-mps3 machine based on the environment.
+    --> select poky-tiny
 
 By sourcing setup-environment, your current directory should now have switched to
-``<corstone700_workspace>/build-iota-tiny/``. If not, change the current directory to this path.
+``<corstone700_workspace>/build-poky-tiny/``. If not, change the current directory to this path.
 Next, to build the stack, execute:
 
 ::
 
-    bitbake iota-tiny-image
+    bitbake arm-reference-image
 
 The initial clean build will be lengthy, given that all host utilities are to be built as well as
 the target images.
 This includes host executables (python, cmake, etc.) and the required toolchain(s).
 
 Once the build is successful, all images will be placed in the
-``<corstone700_workspace>/build-iota-tiny/tmp-iota_tiny/deploy/images/corstone700`` folder.
+``<corstone700_workspace>/build-poky-tiny/tmp-poky_tiny/deploy/images/corstone700-*/`` folder.
 
 Everything apart from the ROM firmware is bundled into a single binary, the
-``iota-tiny-image-corstone700.wic`` file.
+``arm-reference-image-corstone700-*.wic.nopt`` file.
 
 Running the software on FVP
 ---------------------------
@@ -154,22 +157,24 @@ The run-scripts structure is as below:
 ::
 
     run-scripts
-    |── run_model.sh
-    └── scripts
-        └── ...
+    |── iot
+        |── run_model.sh
+        └── scripts
+            └── ...
 
 Ensure that the FVP has its dependencies met by executing the FVP: ``./<Corstone-700 Model Binary>``.
 
 All dependencies are met if the FVP launches without any errors, presenting a graphical interface
 showing information about the current state of the FVP.
 
-The ``run_model.sh`` script in "<corstone700_workspace>/run-scripts" folder will provide the previously built images as arguments to the FVP, and
-launch the FVP. Execute the ``run_model.sh`` script:
+The ``run_model.sh`` script in "<corstone700_workspace>/run-scripts/iot/" folder will provide the
+previously built images as arguments to the FVP, and launch the FVP.
+Execute the ``run_model.sh`` script:
 
 ::
 
        ./run_model.sh
-       usage: run_model.sh ${FVP executable path} [ -u ]
+       usage: run_model.sh ${FVP executable path/<Corstone-700 Model Binary>} [ -u ]
        -u: Run unit test selector
        No additional argument: load and execute model
 
@@ -277,10 +282,10 @@ Here is an example
     IMAGE2UPDATE: RAM                   ;Image Update:NONE/AUTO/FORCE/RAM/AUTOQSPI/FORCEQSPI
     IMAGE2FILE: \SOFTWARE\es_fw.bin     ; - selftest uSD
 
-OUTPUT_DIR=``<corstone700_workspace>/build-iota-tiny/tmp-iota_tiny/deploy/images/corstone700``
+OUTPUT_DIR=``<corstone700_workspace>/build-poky-tiny/tmp-poky_tiny/deploy/images/corstone700-[fvp/mps3]/``
 
 1. Copy se_romfw.bin from OUTPUT_DIR directory to SOFTWARE directory of the FPGA bundle
-2. Copy iota-tiny-image-corstone700.wic from OUTPUT_DIR directory
+2. Copy arm-reference-image-corstone700-mps3.wic.nopt from OUTPUT_DIR directory
    to SOFTWARE directory of the FPGA bundle and rename the wic image to cs700.wic
 3. Copy es_flashfw.bin from OUTPUT_DIR directory to SOFTWARE directory of the FPGA bundle and
    rename es_flashfw.bin to es_fw.bin
