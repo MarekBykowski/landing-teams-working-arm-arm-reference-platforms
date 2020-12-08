@@ -114,4 +114,4 @@ References
 
 *Copyright (c) 2020, Arm Limited. All rights reserved.*
 
-.. _user-guide: ../user-guide.rst
+.. _user-guide: user-guide.rst

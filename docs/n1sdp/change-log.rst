@@ -9,6 +9,28 @@ Change Log
 This document contains a summary of the incremental features, changes, fixes and known
 issues in each release of N1SDP stack. It is listed in the order of latest to oldest
 
+Tagged Version - N1SDP-2020.12.15
+----------------------------------------
+New Features
+^^^^^^^^^^^^
+- Yocto based BSP build to generate Poky image.
+- Streamlining of build-scripts to build only ubuntu image and perf package. Use yocto framework for other components.
+- Enable PCIe devices on secondary chip.
+
+Known Issues and Limitations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- If either of the two boards needs to boot-up in a single chip mode with a C2C setup,
+  then the other board should be powered off.
+- PCIe root port is limited to GEN3 speed due to the on-board PCIe switch itself only supporting
+  upto GEN3 speed.
+- Page Request Interface (PRI) feature is not available in both SMMUs interfacing with the
+  PCIe root ports.
+- Currently only Micron 8GB single Rank DIMM (part number: MTA9ASF1G72PZ-2G6D1) and
+  16GB dual Rank DIMMs (part number:MTA18ASF2G72PDZ-2G6E1) are supported.
+- Stability issues have been observed on long stress tests of the system.
+- On-board HDMI connection is not supported for graphics output. A PCIe graphics card can be used
+  for graphics support.
+
 Tagged Version - N1SDP-2020.07.27
 ----------------------------------------
 New Features
@@ -52,7 +74,7 @@ New Features
 
 - Multichip SMP support over CCIX/PCIe link.
     - Dual socket SMP boot with two N1SDP boards connected over CCIX/PCIe link.
-    - Linux sees 8 cores and DDR memories from both master and slave N1SDP boards.
+    - Linux sees 8 cores and DDR memories from both primary and secondary N1SDP boards.
     - CCIX/PCIe link running at GEN3 x16 speed.
 
 - PCIe GEN4 x16 support in CCIX slot. GEN4 x16 link verified with Mellanox Card (MCX516A-CDAT).

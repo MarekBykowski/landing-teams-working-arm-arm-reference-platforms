@@ -132,6 +132,7 @@ Content of the provided installation script (assumes that network is up):
         echo "LABEL=ESP /boot/efi vfat defaults 0 0" >> etc/fstab
         mkdir /boot/efi
         mount /boot/efi
+        mount -t efivarfs efivarfs /sys/firmware/efi/efivars/
         grub-install || true
         [ -e /linux-image-n1sdp.deb ] && dpkg -i /linux-image-n1sdp.deb
         [ -e /linux-headers-n1sdp.deb ] && dpkg -i /linux-headers-n1sdp.deb

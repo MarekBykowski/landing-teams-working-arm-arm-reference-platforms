@@ -49,6 +49,5 @@ References
 
 *Copyright (c) 2020, Arm Limited. All rights reserved.*
 
-.. _user-guide: ../user-guide.rst
-.. _run-on-n1sdp: run-on-n1sdp.rst
+.. _user-guide: user-guide.rst
 .. _pcie-support: pcie-support.rst
