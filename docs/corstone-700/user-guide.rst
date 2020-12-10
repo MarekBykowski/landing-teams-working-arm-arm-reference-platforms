@@ -189,10 +189,10 @@ login using the username ``root``.
 
 Automated unit tests
 --------------------
-To run the included automated unit test suite, PyCADI must be available and sourced into the current
+To run the included automated unit test suite, PyIRIS must be available and sourced into the current
 environment.
 
-The PyCADI library is available within the Arm FastModelPortfolio package.
+The PyIRIS library is available within the Arm Fast Models evaluation package.
 This package is shipped with most FVPs. If this has not been shipped and installed with the
 Corstone-700 FVP, it may be retrieved as follows:
 
@@ -200,20 +200,20 @@ Download the Fast Models evaluation package:
 https://developer.arm.com/tools-and-software/simulation-models/fast-models
 
 Unzip the downloaded file and execute the ``setup.sh`` script contained within.
-Once prompted for which Fast Model packages to install, tick the "Fast Model Portfolio" package.
+Once prompted for which Fast Model packages to install, select all available packages.
 Note the installation directory. We will refer the installation directory as being
-``~/ARM/FastModelsPortfolio_<version>``.
+``~/ARM/FastModelsxxx_<version>``.
 
-To make the PyCADI library available to python, the following file must be sourced into your
+To make the PyIRIS library available to python, the following file must be sourced into your
 current environment:
 ::
 
-    source ~/ARM/FastModelsPortfolio_<version>/etc/setup.sh
+    source ~/ARM/FastModelsTools_<version>/source_all.sh
 
 For convenience, the above command may be added to your ``.bashrc`` file.
-The Arm PyCADI library requires Python 2.7.
+The Arm PyIRIS library requires Python 2.7.
 
-With the PyCADI library made available in the current environment, the ``run_model.sh``
+With the PyIRIS library made available in the current environment, the ``run_model.sh``
 script may now be executed with the ``-u`` argument, short for unit tests.
 Running the automated unit tests are done through a command line interface. This interface
 has the ``console-menu`` python package as a prerequisite, which may be met by the following
