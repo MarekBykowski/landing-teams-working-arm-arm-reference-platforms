@@ -174,7 +174,7 @@ with the modifications
 ::
 
     cd <n1sdp_workspace>/bsp
-    MACHINE=n1sdp DISTRO=poky . ./conf/setup-environment-n1sdp
+    MACHINE=n1sdp DISTRO=poky . ./conf/setup-environment
     # create a workspace for a given recipe component
     # recipe-component-name can be of:
     # trusted-firmware-a / scp-firmware / edk2-firmware / grub-efi / linux-linaro-arm
