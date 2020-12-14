@@ -14,6 +14,7 @@ The following is a summary of the key software features of the tagged N1SDP-2020
 - Yocto based BSP build to generate Poky distribution image and board firmware binary package.
 - Restructuring the ubuntu build and packaging scripts to generate the custom ubuntu image.
 - Support for both single and multi-chip configurations.
+- Migrate to scp-v2.7 to fix the system shutdown on reaching temperature threshold.
 
 This release is made to restructure the N1SDP profile majorly considering the single and multi-chip profiles, for CCIX accelerator profile please refer to `N1SDP community portal`_.
 

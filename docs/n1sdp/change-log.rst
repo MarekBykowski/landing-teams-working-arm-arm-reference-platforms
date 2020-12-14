@@ -16,6 +16,7 @@ New Features
 - Yocto based BSP build to generate Poky image.
 - Streamlining of build-scripts to build only ubuntu image and perf package. Use yocto framework for other components.
 - Enable PCIe devices on secondary chip.
+- Migrate to scp-v2.7 to fix the system shutdown on reaching temperature threshold.
 
 Known Issues and Limitations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -177,14 +177,16 @@ with the modifications
     MACHINE=n1sdp DISTRO=poky . ./conf/setup-environment
     # create a workspace for a given recipe component
     # recipe-component-name can be of:
-    # trusted-firmware-a / scp-firmware / edk2-firmware / grub-efi / linux-linaro-arm
+    # trusted-firmware-a / scp-firmware / grub-efi / linux-linaro-arm
     devtool modify <recipe-component-name>
     # This creates a new workspace for recipe-component-name and fetches source code
     # into "build-poky/workspace/sources/{trusted-firmware-a,scp-firmware,edk2-firmware,grub-efi,linux-linaro-arm}"
     # edit the source code in the newly created workspace
     # build images with changes on workspace
-    # recipe-component-name can be of: scp-firmware / edk2-firmware / grub-efi / linux-yocto
+    # recipe-component-name can be of: scp-firmware / edk2-firmware / grub-efi / linux-linaro-arm
     bitbake <recipe-component-name>
+
+NOTE : edk2-firmware cannot be built using devtool, kindly refer to the bug report on `bugzilla`_ for more details.
 
 Software Components
 ###################
@@ -512,6 +514,7 @@ booting.
 .. _Linux 5.4 for N1SDP: https://git.linaro.org/landing-teams/working/arm/kernel-release.git
 .. _Poky: https://www.yoctoproject.org/software-item/poky
 .. _repo README file: https://gerrit.googlesource.com/git-repo/+/refs/heads/master/README.md
+.. _bugzilla: https://bugzilla.yoctoproject.org/show_bug.cgi?id=14141
 
 ----------
 
