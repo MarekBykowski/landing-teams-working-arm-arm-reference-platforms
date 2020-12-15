@@ -16,7 +16,7 @@ The following is a summary of the key software features of the tagged N1SDP-2020
 - Support for both single and multi-chip configurations.
 - Migrate to scp-v2.7 to fix the system shutdown on reaching temperature threshold.
 
-This release is made to restructure the N1SDP profile majorly considering the single and multi-chip profiles, for CCIX accelerator profile please refer to `N1SDP community portal`_.
+This release is made to restructure the N1SDP profile majorly considering the single and multi-chip profiles, for CCIX accelerator profile please refer to `release link`_.
 
 Precautions
 -----------
@@ -66,5 +66,5 @@ For support email: support-subsystem-enterprise@arm.com
 
 
 .. _PCIE: pcie-support.rsti
-.. _N1SDP community portal: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/458/neoverse-n1-sdp
+.. _release link: https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/tree/?h=N1SDP-2020.07.27
 .. _potential damage: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/604/notice-potential-damage-to-n1sdp-boards-if-using-latest-firmware-release
