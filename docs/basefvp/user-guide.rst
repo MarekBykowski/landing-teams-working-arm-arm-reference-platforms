@@ -199,6 +199,8 @@ To enable network on FVP, follow below steps
     sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
     sudo brctl addif br0 <bridge_interface_name>
 
+3. For example:
+::
 
     sudo ip link add dummy type dummy  
     sudo brctl addbr br0  
@@ -211,7 +213,6 @@ To enable network on FVP, follow below steps
     sudo ifconfig arm 0.0.0.0 promisc up  
     sudo brctl addif br0 arm  
     brctl show  
-
 
 3. Add below parameters in run_model.sh:
 ::
