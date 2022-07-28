@@ -205,6 +205,19 @@ To enable network on FVP, follow below steps
     -C bp.hostbridge.interfaceName=<bridge_interface_name>
     -C bp.smsc_91c111.enabled=1
 
+eg.
+sudo ip link add dummy type dummy
+sudo brctl addbr br0
+sudo brctl addif br0 dummy
+sudo brctl show
+sudo ifconfig dummy 0.0.0.0
+sudo ifconfig br0 up
+sudo ifconfig br0 192.168.0.10
+sudo ip tuntap add dev arm mode tap user $(whoami)
+sudo ifconfig arm 0.0.0.0 promisc up
+sudo brctl addif br0 arm
+brctl show
+
 4. ./run_model.sh
 
 Build and Run AArch32 builds on Armv8-A Base Platform FVP
