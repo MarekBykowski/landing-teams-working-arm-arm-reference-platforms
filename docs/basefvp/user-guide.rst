@@ -199,7 +199,7 @@ To enable network on FVP, follow below steps
     sudo ifconfig <bridge_interface_name> 0.0.0.0 promisc up
     sudo brctl addif br0 <bridge_interface_name>
 
-eg.
+
     sudo ip link add dummy type dummy  
     sudo brctl addbr br0  
     sudo brctl addif br0 dummy  
