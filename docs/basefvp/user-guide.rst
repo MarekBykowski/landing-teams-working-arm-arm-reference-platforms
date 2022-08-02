@@ -122,6 +122,21 @@ Based on `U-Boot gitlab <https://gitlab.denx.de/u-boot/u-boot>`__
 | Files  | * <workspace>/build-poky/tmp-poky/deploy/images/fvp-base/u-boot.bin           |
 +--------+-------------------------------------------------------------------------------+
 
+fip-fvp.bin
+*****
+
+::
+
+    bitbake -c do_compile trusted-firmware-a
+    bitbake -e trusted-firmware-a|grep ^WORKDIR
+    build-poky/tmp-poky/deploy/images/fvp-base$ /home/bykowmar/yocto/fvp/build-poky/tmp-poky/work/fvp_base-poky-linux/trusted-firmware-a/2.3-r0/git/tools/fiptool/fiptool info fip.bin
+    Trusted Boot Firmware BL2: offset=0x150, size=0x8731, cmdline="--tb-fw"
+    EL3 Runtime Firmware BL31: offset=0x8881, size=0x12000, cmdline="--soc-fw"
+    Non-Trusted Firmware BL33: offset=0x1A881, size=0x78020, cmdline="--nt-fw"
+    HW_CONFIG: offset=0x928A1, size=0x2348, cmdline="--hw-config"
+    TB_FW_CONFIG: offset=0x94BE9, size=0x37A, cmdline="--tb-fw-config"
+    SOC_FW_CONFIG: offset=0x94F63, size=0x48, cmdline="--soc-fw-config"
+    NT_FW_CONFIG: offset=0x94FAB, size=0x48, cmdline="--nt-fw-config"
 
 Linux
 *****
